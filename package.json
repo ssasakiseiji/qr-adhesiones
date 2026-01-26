@@ -1,0 +1,17 @@
+{
+  "name": "voucher-system",
+  "version": "1.0.0",
+  "description": "Sistema de venta de vouchers con códigos QR",
+  "scripts": {
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "restart": "docker-compose restart",
+    "logs": "docker-compose logs -f",
+    "build": "docker-compose up -d --build",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npx http-server -p 8080"
+  },
+  "keywords": ["voucher", "qr", "sales", "food"],
+  "author": "",
+  "license": "ISC"
+}
