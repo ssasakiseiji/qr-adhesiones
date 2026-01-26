@@ -120,6 +120,6 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd /srv/qr-adhesiones
-            docker-compose ps
+            docker compose ps
             echo "Deployment completed successfully!"
           EOF
