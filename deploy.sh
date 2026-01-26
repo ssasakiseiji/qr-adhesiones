@@ -3,10 +3,7 @@ set -e
 
 echo "🚀 Starting deployment..."
 
-# Login to GitHub Container Registry
-echo "$GHCR_TOKEN" | docker login ghcr.io -u ssasakiseiji --password-stdin
-
-# Pull latest images
+# Pull latest images (authentication already handled)
 echo "📦 Pulling latest Docker images..."
 docker-compose pull
 

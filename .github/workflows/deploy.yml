@@ -94,6 +94,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd /srv/qr-adhesiones
@@ -104,6 +105,9 @@ jobs:
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
           ENVEOF
+            
+            # Login to GitHub Container Registry (public images don't need auth, but just in case)
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             
             # Make deploy script executable
             chmod +x deploy.sh
