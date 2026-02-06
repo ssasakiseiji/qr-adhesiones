@@ -43,8 +43,8 @@ class API {
             if (!response.ok) {
                 if (response.status === 401 || (response.status === 403 && (data.error === 'Token expired' || data.error === 'Invalid token'))) {
                     this.clearToken();
-                    window.location.reload();
-                    return;
+                    window.dispatchEvent(new Event('session-expired'));
+                    throw new Error('Session expired');
                 }
                 throw new Error(data.error || 'Request failed');
             }

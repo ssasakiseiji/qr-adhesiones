@@ -31,6 +31,11 @@ class Auth {
         document.getElementById('logout-btn').addEventListener('click', () => {
             this.logout();
         });
+
+        // Session expired
+        window.addEventListener('session-expired', () => {
+            this.onSessionExpired();
+        });
     }
 
     switchTab(tabName) {
@@ -97,6 +102,13 @@ class Auth {
         this.currentUser = null;
         this.showAuth();
         this.showToast('Sesión cerrada', 'info');
+    }
+
+    onSessionExpired() {
+        api.clearToken();
+        this.currentUser = null;
+        this.showAuth();
+        this.showToast('Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.', 'warning');
     }
 
     showAuth() {
