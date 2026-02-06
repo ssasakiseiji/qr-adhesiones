@@ -14,6 +14,9 @@ const metricsRoutes = require('./routes/metrics');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy (behind nginx reverse proxy)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
 

@@ -41,6 +41,11 @@ class API {
             const data = await response.json();
 
             if (!response.ok) {
+                if (response.status === 401 || (response.status === 403 && (data.error === 'Token expired' || data.error === 'Invalid token'))) {
+                    this.clearToken();
+                    window.location.reload();
+                    return;
+                }
                 throw new Error(data.error || 'Request failed');
             }
 
