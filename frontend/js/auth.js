@@ -105,6 +105,7 @@ class Auth {
     }
 
     onSessionExpired() {
+        if (!api.token) return; // Already handled
         api.clearToken();
         this.currentUser = null;
         this.showAuth();
@@ -130,11 +131,24 @@ class Auth {
 
     checkAuth() {
         const token = localStorage.getItem('token');
-        if (token) {
+        if (token && !this.isTokenExpired(token)) {
             api.setToken(token);
             this.showApp();
         } else {
+            if (token) {
+                api.clearToken();
+                this.showToast('Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.', 'warning');
+            }
             this.showAuth();
+        }
+    }
+
+    isTokenExpired(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 < Date.now();
+        } catch {
+            return true;
         }
     }
 
