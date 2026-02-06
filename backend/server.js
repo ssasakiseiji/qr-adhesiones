@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const activityRoutes = require('./routes/activities');
 const voucherRoutes = require('./routes/vouchers');
 const metricsRoutes = require('./routes/metrics');
+const logoRoutes = require('./routes/logos');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +28,7 @@ app.use(cors({
 }));
 
 // Body parsing middleware
-app.use(express.json());
+app.use(express.json({ limit: '500kb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
@@ -43,6 +44,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/vouchers', voucherRoutes);
 app.use('/api/metrics', metricsRoutes);
+app.use('/api/logos', logoRoutes);
 
 // 404 handler
 app.use((req, res) => {

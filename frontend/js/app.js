@@ -4,6 +4,8 @@ import vouchers from './vouchers.js';
 import scanner from './scanner.js';
 import metrics from './metrics.js';
 import activityDetail from './activityDetail.js';
+import qrTemplate from './qrTemplate.js';
+import logoManager from './logoManager.js';
 
 class App {
     constructor() {
@@ -32,6 +34,8 @@ class App {
             scanner.init();
             metrics.init();
             activityDetail.init();
+            qrTemplate.init();
+            logoManager.init();
 
             // Load initial data
             await this.loadDashboard();

@@ -226,6 +226,9 @@
               Cliente: <span id="result-customer"></span>
             </p>
             <p class="amount-info">Monto: <span id="result-amount"></span></p>
+            <button id="view-card-btn" class="btn btn-primary">
+              Ver Tarjeta
+            </button>
             <button id="download-qr" class="btn btn-secondary">
               Descargar QR
             </button>
@@ -298,6 +301,9 @@
                 class="voucher-badge"
               ></span>
             </div>
+            <button id="detail-template-btn" class="btn btn-secondary">
+              Modelo QR
+            </button>
           </div>
 
           <div id="detail-metrics" class="stats-grid"></div>
@@ -376,6 +382,96 @@
       </nav>
     </div>
 
+    <!-- QR Template Configuration Modal -->
+    <div id="template-modal" class="modal hidden">
+      <div class="modal-content modal-lg">
+        <div class="modal-header">
+          <h3>Configurar Modelo QR</h3>
+          <button class="modal-close" id="template-modal-close">&times;</button>
+        </div>
+        <form id="template-form">
+          <div class="form-group">
+            <label for="template-title">Titulo del Evento</label>
+            <input type="text" id="template-title" placeholder="Ej: Festival de Comida 2026" />
+          </div>
+          <div class="form-group">
+            <label for="template-product">Nombre del Producto</label>
+            <input type="text" id="template-product" placeholder="Ej: Asado con Guarnicion" />
+          </div>
+          <div class="form-group">
+            <label for="template-bg-color">Color de Fondo</label>
+            <div class="color-picker-row">
+              <input type="color" id="template-bg-color" value="#1e293b" class="color-picker-swatch" />
+              <input type="text" id="template-bg-color-text" value="#1e293b" maxlength="7" class="color-picker-text" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Logo</label>
+            <div id="template-logo-selector" class="logo-selector"></div>
+            <button type="button" id="manage-logos-btn" class="btn btn-outline mt-1" style="font-size:0.85rem;">
+              Gestionar Logos
+            </button>
+          </div>
+          <div class="form-group">
+            <label>Vista Previa</label>
+            <div style="text-align:center;background:var(--bg-glass);padding:var(--spacing-sm);border-radius:var(--border-radius);">
+              <canvas id="template-preview-canvas" style="max-width:100%;height:auto;border-radius:8px;"></canvas>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Guardar Modelo</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Logo Management Modal -->
+    <div id="logo-modal" class="modal hidden" style="z-index:1002;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Gestionar Logos</h3>
+          <button class="modal-close" id="logo-modal-close">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="logo-name">Nombre del Logo</label>
+          <input type="text" id="logo-name" placeholder="Ej: Logo del Club" />
+        </div>
+        <div class="form-group">
+          <label>Importar SVG</label>
+          <div class="logo-import-buttons">
+            <button type="button" id="logo-upload-btn" class="btn btn-outline">
+              Subir archivo .svg
+            </button>
+            <button type="button" id="logo-paste-btn" class="btn btn-outline">
+              Pegar codigo SVG
+            </button>
+          </div>
+          <input type="file" id="logo-file-input" accept=".svg" style="display:none;" />
+          <textarea id="logo-svg-textarea" class="hidden logo-svg-input" rows="4" placeholder="Pegar contenido SVG aqui..."></textarea>
+        </div>
+        <div id="logo-preview" class="hidden" style="text-align:center;background:var(--bg-glass);padding:1rem;border-radius:8px;margin-bottom:1rem;"></div>
+        <button type="button" id="logo-save-btn" class="btn btn-primary hidden" style="width:100%;margin-bottom:1rem;">
+          Guardar Logo
+        </button>
+        <hr style="border-color:var(--border-color);margin:1rem 0;" />
+        <h4 style="margin-bottom:0.5rem;color:var(--text-secondary);">Logos Guardados</h4>
+        <div id="logos-list" class="vouchers-list"></div>
+      </div>
+    </div>
+
+    <!-- Voucher Card Preview/Export Modal -->
+    <div id="voucher-card-modal" class="modal hidden">
+      <div class="modal-content modal-sm text-center">
+        <div class="modal-header">
+          <h3>Tarjeta del Voucher</h3>
+          <button class="modal-close" id="voucher-card-modal-close">&times;</button>
+        </div>
+        <canvas id="voucher-card-canvas" class="voucher-card-preview"></canvas>
+        <div class="export-buttons">
+          <button id="export-png-btn" class="btn btn-primary">Descargar PNG</button>
+          <button id="export-pdf-btn" class="btn btn-secondary">Descargar PDF</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay hidden">
       <div class="spinner"></div>
@@ -386,6 +482,7 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/html5-qrcode" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" defer></script>
     <script type="module" src="js/app.js"></script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 import api from './api.js';
 import activities from './activities.js';
+import qrTemplate from './qrTemplate.js';
 
 class Vouchers {
     constructor() {
@@ -44,6 +45,7 @@ class Vouchers {
             const response = await api.createVoucher(activity.id, customerName, amount);
             
             this.currentVoucher = response.voucher;
+            qrTemplate.setCurrentVoucher(response.voucher);
             this.displayVoucher(response.voucher);
             
             this.showToast('Voucher creado exitosamente', 'success');

@@ -21,6 +21,30 @@ const Activity = sequelize.define('Activity', {
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
+  },
+  templateTitle: {
+    type: DataTypes.STRING(200),
+    allowNull: true
+  },
+  templateProductName: {
+    type: DataTypes.STRING(200),
+    allowNull: true
+  },
+  templateBgColor: {
+    type: DataTypes.STRING(7),
+    allowNull: true,
+    defaultValue: '#1e293b',
+    validate: {
+      is: /^#[0-9A-Fa-f]{6}$/
+    }
+  },
+  templateLogoId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'logos',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'activities',

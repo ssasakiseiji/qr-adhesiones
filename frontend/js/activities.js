@@ -28,8 +28,8 @@ class Activities {
             await this.createActivity();
         });
 
-        // Modal close
-        document.querySelector('.modal-close').addEventListener('click', () => {
+        // Modal close (scoped to activity modal)
+        document.querySelector('#activity-modal .modal-close').addEventListener('click', () => {
             this.hideActivityModal();
         });
     }

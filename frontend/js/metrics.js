@@ -101,24 +101,24 @@ class Metrics {
 
         container.innerHTML = byActivity.map(activity => `
             <div class="voucher-item">
-                <div>
+                <div style="min-width:0;width:100%;">
                     <h4>${activity.activityName}</h4>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 0.5rem;">
+                    <div class="activity-metrics-grid">
                         <div>
                             <small class="text-muted">Recaudación</small>
-                            <p style="font-weight: 600; color: var(--primary-light);">$${activity.totalRevenue.toFixed(2)}</p>
+                            <p class="activity-metric-value activity-metric-highlight">$${activity.totalRevenue.toFixed(2)}</p>
                         </div>
                         <div>
                             <small class="text-muted">Vendidos</small>
-                            <p style="font-weight: 600;">${activity.totalVouchers}</p>
+                            <p class="activity-metric-value">${activity.totalVouchers}</p>
                         </div>
                         <div>
                             <small class="text-muted">Retirados</small>
-                            <p style="font-weight: 600;">${activity.redeemedCount}</p>
+                            <p class="activity-metric-value">${activity.redeemedCount}</p>
                         </div>
                         <div>
                             <small class="text-muted">Tasa de Retiro</small>
-                            <p style="font-weight: 600;">${activity.redemptionRate}%</p>
+                            <p class="activity-metric-value">${activity.redemptionRate}%</p>
                         </div>
                     </div>
                 </div>

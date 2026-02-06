@@ -42,7 +42,9 @@ class ActivityDetail {
     }
 
     renderHeader(activity) {
-        document.getElementById('detail-activity-name').textContent = activity.name;
+        const nameEl = document.getElementById('detail-activity-name');
+        nameEl.textContent = activity.name;
+        nameEl.dataset.activityId = activity.id;
         const badge = document.getElementById('detail-activity-badge');
         badge.textContent = activity.isActive !== false ? 'Activa' : 'Inactiva';
         badge.className = `voucher-badge ${activity.isActive !== false ? 'redeemed' : 'pending'}`;

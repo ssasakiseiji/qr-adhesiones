@@ -125,6 +125,32 @@ class API {
         return this.request(`/vouchers/scan/${encodeURIComponent(qrCode)}`);
     }
 
+    // Logo endpoints
+    async getLogos() {
+        return this.request('/logos');
+    }
+
+    async createLogo(name, svgContent) {
+        return this.request('/logos', {
+            method: 'POST',
+            body: JSON.stringify({ name, svgContent })
+        });
+    }
+
+    async deleteLogo(id) {
+        return this.request(`/logos/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // Activity template
+    async updateTemplate(activityId, templateData) {
+        return this.request(`/activities/${activityId}/template`, {
+            method: 'PUT',
+            body: JSON.stringify(templateData)
+        });
+    }
+
     // Metrics endpoints
     async getSummaryMetrics() {
         return this.request('/metrics/summary');

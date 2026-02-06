@@ -1,9 +1,10 @@
-const { Activity, Voucher } = require('../models');
+const { Activity, Voucher, Logo } = require('../models');
 const { Op } = require('sequelize');
 
 const getAllActivities = async (req, res) => {
   try {
     const activities = await Activity.findAll({
+      include: [{ model: Logo, as: 'templateLogo', attributes: ['id', 'name', 'svgContent'] }],
       order: [['createdAt', 'DESC']]
     });
 
@@ -88,9 +89,48 @@ const deleteActivity = async (req, res) => {
   }
 };
 
+const updateTemplate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { templateTitle, templateProductName, templateBgColor, templateLogoId } = req.body;
+
+    const activity = await Activity.findByPk(id);
+    if (!activity) {
+      return res.status(404).json({ error: 'Activity not found' });
+    }
+
+    if (templateLogoId) {
+      const logo = await Logo.findByPk(templateLogoId);
+      if (!logo) {
+        return res.status(404).json({ error: 'Logo not found' });
+      }
+    }
+
+    await activity.update({
+      templateTitle: templateTitle !== undefined ? templateTitle : activity.templateTitle,
+      templateProductName: templateProductName !== undefined ? templateProductName : activity.templateProductName,
+      templateBgColor: templateBgColor !== undefined ? templateBgColor : activity.templateBgColor,
+      templateLogoId: templateLogoId !== undefined ? templateLogoId : activity.templateLogoId,
+    });
+
+    const updated = await Activity.findByPk(id, {
+      include: [{ model: Logo, as: 'templateLogo', attributes: ['id', 'name', 'svgContent'] }]
+    });
+
+    res.json({
+      message: 'Template updated successfully',
+      activity: updated
+    });
+  } catch (error) {
+    console.error('Update template error:', error);
+    res.status(500).json({ error: 'Failed to update template' });
+  }
+};
+
 module.exports = {
   getAllActivities,
   createActivity,
   updateActivity,
-  deleteActivity
+  deleteActivity,
+  updateTemplate
 };

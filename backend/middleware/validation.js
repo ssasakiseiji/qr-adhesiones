@@ -70,10 +70,45 @@ const uuidValidation = [
   validate
 ];
 
+const logoValidation = [
+  body('name')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Logo name is required (max 100 characters)'),
+  body('svgContent')
+    .notEmpty()
+    .withMessage('SVG content is required'),
+  validate
+];
+
+const templateValidation = [
+  body('templateTitle')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Template title must be at most 200 characters'),
+  body('templateProductName')
+    .optional()
+    .trim()
+    .isLength({ max: 200 })
+    .withMessage('Product name must be at most 200 characters'),
+  body('templateBgColor')
+    .optional()
+    .matches(/^#[0-9A-Fa-f]{6}$/)
+    .withMessage('Background color must be a valid hex color'),
+  body('templateLogoId')
+    .optional({ values: 'null' })
+    .isUUID()
+    .withMessage('Logo ID must be a valid UUID'),
+  validate
+];
+
 module.exports = {
   registerValidation,
   loginValidation,
   activityValidation,
   voucherValidation,
-  uuidValidation
+  uuidValidation,
+  logoValidation,
+  templateValidation
 };
