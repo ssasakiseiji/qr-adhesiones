@@ -1,4 +1,5 @@
 import api from './api.js';
+import { icon } from './icons.js';
 
 class Scanner {
     constructor() {
@@ -81,7 +82,7 @@ class Scanner {
         resultContainer.classList.remove('hidden');
 
         if (voucher.isRedeemed) {
-            statusEl.textContent = '⚠️ Voucher Ya Retirado';
+            statusEl.innerHTML = `${icon('warning')} Voucher Ya Retirado`;
             statusEl.style.color = 'var(--warning)';
             
             detailsEl.innerHTML = `
@@ -96,7 +97,7 @@ class Scanner {
                 </button>
             `;
         } else {
-            statusEl.textContent = '✅ Voucher Válido';
+            statusEl.innerHTML = `${icon('check')} Voucher Válido`;
             statusEl.style.color = 'var(--success)';
             
             detailsEl.innerHTML = `
@@ -126,7 +127,7 @@ class Scanner {
         document.getElementById('scanner-container').style.display = 'none';
         resultContainer.classList.remove('hidden');
 
-        statusEl.textContent = '❌ Error';
+        statusEl.innerHTML = `${icon('error')} Error`;
         statusEl.style.color = 'var(--error)';
         
         detailsEl.innerHTML = `<p>${message}</p>`;

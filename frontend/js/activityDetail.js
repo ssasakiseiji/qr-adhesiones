@@ -1,4 +1,5 @@
 import api from './api.js';
+import { icon } from './icons.js';
 
 class ActivityDetail {
     constructor() {
@@ -51,28 +52,28 @@ class ActivityDetail {
         const container = document.getElementById('detail-metrics');
         container.innerHTML = `
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
+                <div class="stat-icon">${icon('money')}</div>
                 <div class="stat-content">
                     <h3>Recaudación</h3>
                     <p class="stat-value">$${metrics.totalRevenue.toFixed(2)}</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">🎫</div>
+                <div class="stat-icon">${icon('ticket')}</div>
                 <div class="stat-content">
                     <h3>Vendidos</h3>
                     <p class="stat-value">${metrics.totalVouchers}</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon">${icon('check')}</div>
                 <div class="stat-content">
                     <h3>Retirados</h3>
                     <p class="stat-value">${metrics.redeemedCount}</p>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">📊</div>
+                <div class="stat-icon">${icon('chart')}</div>
                 <div class="stat-content">
                     <h3>Tasa de Retiro</h3>
                     <p class="stat-value">${metrics.redemptionRate}%</p>

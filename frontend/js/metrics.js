@@ -1,6 +1,7 @@
 import api from './api.js';
 import activities from './activities.js';
 import vouchers from './vouchers.js';
+import { icon } from './icons.js';
 
 class Metrics {
     constructor() {
@@ -59,28 +60,28 @@ class Metrics {
         container.innerHTML = `
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">💰</div>
+                    <div class="stat-icon">${icon('money')}</div>
                     <div class="stat-content">
                         <h3>Recaudación Total</h3>
                         <p class="stat-value">$${overall.totalRevenue.toFixed(2)}</p>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">🎫</div>
+                    <div class="stat-icon">${icon('ticket')}</div>
                     <div class="stat-content">
                         <h3>Vouchers Vendidos</h3>
                         <p class="stat-value">${overall.totalVouchers}</p>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">✅</div>
+                    <div class="stat-icon">${icon('check')}</div>
                     <div class="stat-content">
                         <h3>Vouchers Retirados</h3>
                         <p class="stat-value">${overall.redeemedCount}</p>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📊</div>
+                    <div class="stat-icon">${icon('chart')}</div>
                     <div class="stat-content">
                         <h3>Tasa de Retiro</h3>
                         <p class="stat-value">${overall.redemptionRate}%</p>

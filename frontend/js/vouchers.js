@@ -65,7 +65,7 @@ class Vouchers {
 
         // Display QR code
         const qrDisplay = document.getElementById('qr-code-display');
-        qrDisplay.innerHTML = `<img src="${voucher.qrCodeImage}" alt="QR Code">`;
+        qrDisplay.innerHTML = `<img src="${voucher.qrCodeImage}" alt="QR Code" loading="lazy">`;
 
         // Display customer info
         document.getElementById('result-customer').textContent = voucher.customerName;

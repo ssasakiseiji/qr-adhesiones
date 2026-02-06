@@ -52,6 +52,36 @@
   box-sizing: border-box;
 }
 
+/* SVG Icon System */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  fill: none;
+  stroke: currentColor;
+}
+
+.stat-icon .icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.nav-icon .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.action-icon .icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* Touch optimization */
+button, a, select, .nav-item, .action-btn, .auth-tab, .voucher-item {
+  touch-action: manipulation;
+}
+
 body {
   font-family:
     "Inter",
@@ -63,6 +93,7 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  min-height: 100svh;
   overflow-x: hidden;
 }
 
@@ -78,6 +109,7 @@ body {
 /* Auth Screen */
 .auth-container {
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,6 +176,7 @@ body {
 .auth-tab {
   flex: 1;
   padding: var(--spacing-sm) var(--spacing-md);
+  min-height: 44px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -199,7 +232,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: max(16px, 1rem);
   transition: all var(--transition-base);
 }
 
@@ -214,6 +247,7 @@ body {
 /* Buttons */
 .btn {
   padding: var(--spacing-sm) var(--spacing-lg);
+  min-height: 44px;
   border: none;
   border-radius: var(--border-radius);
   font-weight: 600;
@@ -273,7 +307,7 @@ body {
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: max(var(--spacing-md), env(safe-area-inset-top)) max(var(--spacing-lg), env(safe-area-inset-right)) var(--spacing-md) max(var(--spacing-lg), env(safe-area-inset-left));
   position: sticky;
   top: 0;
   z-index: 100;
@@ -300,6 +334,8 @@ body {
 
 .activity-select {
   padding: var(--spacing-sm) var(--spacing-md);
+  min-height: 44px;
+  font-size: max(16px, 1rem);
   background: var(--bg-glass);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -313,7 +349,9 @@ body {
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--spacing-xl);
-  padding-bottom: 100px;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(var(--spacing-xl), env(safe-area-inset-left));
+  padding-right: max(var(--spacing-xl), env(safe-area-inset-right));
 }
 
 .view {
@@ -524,7 +562,7 @@ body {
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: space-around;
-  padding: var(--spacing-sm) 0;
+  padding: var(--spacing-sm) env(safe-area-inset-right, 0px) max(var(--spacing-sm), env(safe-area-inset-bottom)) env(safe-area-inset-left, 0px);
   z-index: 100;
 }
 
@@ -538,6 +576,7 @@ body {
   align-items: center;
   gap: 4px;
   padding: var(--spacing-xs) var(--spacing-md);
+  min-height: 44px;
   transition: all var(--transition-base);
   flex: 1;
 }
@@ -723,8 +762,8 @@ body {
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -741,6 +780,9 @@ body {
 @media (max-width: 768px) {
   .app-main {
     padding: var(--spacing-md);
+    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
   }
 
   .stats-grid {
@@ -753,7 +795,24 @@ body {
 
   .activity-select {
     min-width: 150px;
-    font-size: 0.875rem;
+    font-size: max(16px, 0.875rem);
+  }
+}
+
+.filter-select {
+  min-height: 44px;
+  font-size: max(16px, 1rem);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
