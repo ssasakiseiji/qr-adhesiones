@@ -152,11 +152,12 @@ body {
 .auth-header h1 {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary-light), var(--secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-light);
   margin-bottom: var(--spacing-sm);
+}
+
+.auth-header h1 .icon {
+  stroke: var(--primary-light);
 }
 
 .auth-header p {
@@ -776,32 +777,244 @@ body {
   color: var(--text-primary);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .app-main {
-    padding: var(--spacing-md);
-    padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-    padding-left: max(var(--spacing-md), env(safe-area-inset-left));
-    padding-right: max(var(--spacing-md), env(safe-area-inset-right));
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .header-content h1 {
-    font-size: 1.25rem;
-  }
-
-  .activity-select {
-    min-width: 150px;
-    font-size: max(16px, 0.875rem);
-  }
-}
-
+/* Filter Selects */
 .filter-select {
   min-height: 44px;
   font-size: max(16px, 1rem);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+}
+
+.table-filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  /* Main content */
+  .app-main {
+    padding: var(--spacing-sm);
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    padding-left: max(var(--spacing-sm), env(safe-area-inset-left));
+    padding-right: max(var(--spacing-sm), env(safe-area-inset-right));
+  }
+
+  /* Header - stack vertically */
+  .header-content {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .header-content h1 {
+    font-size: 1.1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    gap: var(--spacing-sm);
+  }
+
+  .activity-select {
+    min-width: 0;
+    flex: 1;
+    font-size: max(16px, 0.875rem);
+  }
+
+  #logout-btn {
+    font-size: 0.8rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    white-space: nowrap;
+  }
+
+  /* Stats */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+
+  .stat-card {
+    padding: var(--spacing-sm);
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-xs);
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .stat-icon .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .stat-content h3 {
+    font-size: 0.7rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  /* Quick actions */
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+  }
+
+  .action-btn {
+    padding: var(--spacing-md);
+    font-size: 0.9rem;
+  }
+
+  .action-icon {
+    font-size: 2rem;
+  }
+
+  .action-icon .icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* View headers */
+  .view-header {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .view-header h2 {
+    font-size: 1.25rem;
+    width: 100%;
+  }
+
+  /* Buttons full width in forms */
+  .voucher-form .btn,
+  .auth-form .btn,
+  #activity-form .btn {
+    width: 100%;
+  }
+
+  /* QR result */
+  .qr-result {
+    padding: var(--spacing-md);
+  }
+
+  .qr-code-display {
+    padding: var(--spacing-sm);
+  }
+
+  .qr-code-display img {
+    max-width: 100%;
+  }
+
+  .qr-result .btn {
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  /* Voucher form */
+  .voucher-form {
+    padding: var(--spacing-md);
+  }
+
+  /* Filters */
+  .table-filters {
+    flex-direction: column;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  /* Voucher items */
+  .voucher-item {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .voucher-item > div:first-child {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .voucher-item h4 {
+    font-size: 0.9rem;
+    word-break: break-word;
+  }
+
+  /* Toast */
+  .toast-container {
+    left: var(--spacing-sm);
+    right: var(--spacing-sm);
+  }
+
+  .toast {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Scanner */
+  .scanner-container {
+    padding: var(--spacing-sm);
+  }
+
+  .scan-result {
+    padding: var(--spacing-md);
+  }
+
+  .scan-result .btn {
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  /* Bottom nav compact */
+  .nav-item {
+    padding: var(--spacing-xs) 0;
+  }
+
+  .nav-label {
+    font-size: 0.65rem;
+  }
+
+  /* Auth */
+  .auth-card {
+    padding: var(--spacing-md);
+  }
+
+  .auth-header h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Modal */
+  .modal {
+    padding: var(--spacing-sm);
+  }
+
+  .modal-content {
+    padding: var(--spacing-md);
+  }
+
+  /* Recent vouchers */
+  .recent-vouchers h2 {
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  /* Metrics sections */
+  .metrics-summary h3,
+  .metrics-by-activity h3,
+  .vouchers-table h3 {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-sm);
+  }
 }
 
 /* Respect reduced motion preferences */
