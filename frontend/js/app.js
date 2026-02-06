@@ -3,6 +3,7 @@ import activities from './activities.js';
 import vouchers from './vouchers.js';
 import scanner from './scanner.js';
 import metrics from './metrics.js';
+import activityDetail from './activityDetail.js';
 
 class App {
     constructor() {
@@ -30,6 +31,7 @@ class App {
             vouchers.init();
             scanner.init();
             metrics.init();
+            activityDetail.init();
 
             // Load initial data
             await this.loadDashboard();
@@ -46,6 +48,16 @@ class App {
 
             window.addEventListener('voucher-redeemed', () => {
                 this.onVoucherRedeemed();
+            });
+
+            // Listen for activity detail navigation
+            window.addEventListener('navigate-activity-detail', (e) => {
+                this.openActivityDetail(e.detail.activityId);
+            });
+
+            // Listen for generic view navigation
+            window.addEventListener('navigate-view', (e) => {
+                this.navigateToView(e.detail.view);
             });
         } catch (error) {
             console.error('Error initializing app:', error);
@@ -77,9 +89,10 @@ class App {
         });
         document.getElementById(`${viewName}-view`).classList.add('active');
 
-        // Update navigation
+        // Update navigation - activity-detail keeps "activities" highlighted
+        const navView = viewName === 'activity-detail' ? 'activities' : viewName;
         document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-            item.classList.toggle('active', item.dataset.view === viewName);
+            item.classList.toggle('active', item.dataset.view === navView);
         });
 
         this.currentView = viewName;
@@ -102,6 +115,11 @@ class App {
                 // Activities already loaded
                 break;
         }
+    }
+
+    async openActivityDetail(activityId) {
+        await this.navigateToView('activity-detail');
+        await activityDetail.loadDetail(activityId);
     }
 
     async loadDashboard() {

@@ -236,6 +236,36 @@
           </div>
         </div>
 
+        <!-- Activity Detail View -->
+        <div id="activity-detail-view" class="view">
+          <div class="view-header">
+            <button id="detail-back-btn" class="btn btn-outline">
+              ← Volver
+            </button>
+            <div>
+              <h2 id="detail-activity-name"></h2>
+              <span
+                id="detail-activity-badge"
+                class="voucher-badge"
+              ></span>
+            </div>
+          </div>
+
+          <div id="detail-metrics" class="stats-grid"></div>
+
+          <div class="vouchers-table" style="margin-top: var(--spacing-lg)">
+            <h3>Ventas</h3>
+            <div class="table-filters">
+              <select id="detail-filter-status" class="filter-select">
+                <option value="">Todos los estados</option>
+                <option value="false">Pendientes</option>
+                <option value="true">Retirados</option>
+              </select>
+            </div>
+            <div id="detail-vouchers-list" class="vouchers-list"></div>
+          </div>
+        </div>
+
         <!-- Activities Management View -->
         <div id="activities-view" class="view">
           <div class="view-header">

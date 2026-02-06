@@ -87,7 +87,7 @@ class Activities {
         }
 
         container.innerHTML = this.activities.map(activity => `
-            <div class="voucher-item">
+            <div class="voucher-item" style="cursor: pointer;" data-activity-id="${activity.id}">
                 <div>
                     <h4>${activity.name}</h4>
                     <p class="text-muted">${activity.description || 'Sin descripción'}</p>
@@ -100,6 +100,14 @@ class Activities {
                 </div>
             </div>
         `).join('');
+
+        // Add click handlers
+        container.querySelectorAll('[data-activity-id]').forEach(item => {
+            item.addEventListener('click', () => {
+                const activityId = item.dataset.activityId;
+                window.dispatchEvent(new CustomEvent('navigate-activity-detail', { detail: { activityId } }));
+            });
+        });
     }
 
     selectActivity(activityId) {
