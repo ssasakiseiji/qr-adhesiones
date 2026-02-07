@@ -549,6 +549,7 @@
     <!-- Failsafe: if JS modules fail to load, hide splash and show login -->
     <script>
       setTimeout(function() {
+        if (window.__appLoaded) return;
         var s = document.getElementById('splash-screen');
         if (s && !s.classList.contains('hidden')) {
           s.classList.add('hidden');

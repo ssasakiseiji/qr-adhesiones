@@ -192,6 +192,9 @@ class App {
     }
 }
 
+// Signal that JS modules loaded (disables HTML failsafe)
+window.__appLoaded = true;
+
 // Initialize app when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
