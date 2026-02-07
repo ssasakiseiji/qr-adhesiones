@@ -1,11 +1,11 @@
-import auth from './auth.js';
-import activities from './activities.js';
-import vouchers from './vouchers.js';
-import scanner from './scanner.js';
-import metrics from './metrics.js';
-import activityDetail from './activityDetail.js';
-import qrTemplate from './qrTemplate.js';
-import logoManager from './logoManager.js';
+import auth from './auth.js?v=2';
+import activities from './activities.js?v=2';
+import vouchers from './vouchers.js?v=2';
+import scanner from './scanner.js?v=2';
+import metrics from './metrics.js?v=2';
+import activityDetail from './activityDetail.js?v=2';
+import qrTemplate from './qrTemplate.js?v=2';
+import logoManager from './logoManager.js?v=2';
 
 class App {
     constructor() {

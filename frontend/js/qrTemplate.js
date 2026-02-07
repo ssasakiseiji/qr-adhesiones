@@ -1,6 +1,6 @@
-import api from './api.js';
-import activities from './activities.js';
-import logoManager from './logoManager.js';
+import api from './api.js?v=2';
+import activities from './activities.js?v=2';
+import logoManager from './logoManager.js?v=2';
 
 class QrTemplate {
     constructor() {

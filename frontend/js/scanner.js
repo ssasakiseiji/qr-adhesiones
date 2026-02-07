@@ -1,5 +1,5 @@
-import api from './api.js';
-import { icon } from './icons.js';
+import api from './api.js?v=2';
+import { icon } from './icons.js?v=2';
 
 class Scanner {
     constructor() {

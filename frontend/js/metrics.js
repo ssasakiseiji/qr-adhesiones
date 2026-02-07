@@ -1,7 +1,7 @@
-import api from './api.js';
-import activities from './activities.js';
-import vouchers from './vouchers.js';
-import { icon } from './icons.js';
+import api from './api.js?v=2';
+import activities from './activities.js?v=2';
+import vouchers from './vouchers.js?v=2';
+import { icon } from './icons.js?v=2';
 
 class Metrics {
     constructor() {

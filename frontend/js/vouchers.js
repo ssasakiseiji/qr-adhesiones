@@ -1,6 +1,6 @@
-import api from './api.js';
-import activities from './activities.js';
-import qrTemplate from './qrTemplate.js';
+import api from './api.js?v=2';
+import activities from './activities.js?v=2';
+import qrTemplate from './qrTemplate.js?v=2';
 
 class Vouchers {
     constructor() {
