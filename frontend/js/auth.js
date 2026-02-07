@@ -7,24 +7,10 @@ class Auth {
     }
 
     initEventListeners() {
-        // Tab switching
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const tabName = e.target.dataset.tab;
-                this.switchTab(tabName);
-            });
-        });
-
         // Login form
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             await this.handleLogin();
-        });
-
-        // Register form
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await this.handleRegister();
         });
 
         // Logout
@@ -36,62 +22,35 @@ class Auth {
         window.addEventListener('session-expired', () => {
             this.onSessionExpired();
         });
-    }
 
-    switchTab(tabName) {
-        // Update tabs
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.tab === tabName);
-        });
-
-        // Update forms
-        document.querySelectorAll('.auth-form').forEach(form => {
-            form.classList.toggle('active', form.id === `${tabName}-form`);
-        });
-
-        // Clear errors
-        document.getElementById('login-error').textContent = '';
-        document.getElementById('register-error').textContent = '';
+        // Load remembered email
+        this.loadRememberedEmail();
     }
 
     async handleLogin() {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
+        const rememberCheck = document.getElementById('remember-email');
         const errorEl = document.getElementById('login-error');
 
         try {
             this.showLoading(true);
             const response = await api.login(email, password);
-            
+
+            // Save or clear remembered email
+            if (rememberCheck && rememberCheck.checked) {
+                localStorage.setItem('remembered_email', email);
+            } else {
+                localStorage.removeItem('remembered_email');
+            }
+
             api.setToken(response.token);
             this.currentUser = response.user;
-            
+
             this.showApp();
             this.showToast('Inicio de sesión exitoso', 'success');
         } catch (error) {
             errorEl.textContent = error.message || 'Error al iniciar sesión';
-        } finally {
-            this.showLoading(false);
-        }
-    }
-
-    async handleRegister() {
-        const username = document.getElementById('register-username').value;
-        const email = document.getElementById('register-email').value;
-        const password = document.getElementById('register-password').value;
-        const errorEl = document.getElementById('register-error');
-
-        try {
-            this.showLoading(true);
-            const response = await api.register(username, email, password);
-            
-            api.setToken(response.token);
-            this.currentUser = response.user;
-            
-            this.showApp();
-            this.showToast('Registro exitoso', 'success');
-        } catch (error) {
-            errorEl.textContent = error.message || 'Error al registrarse';
         } finally {
             this.showLoading(false);
         }
@@ -114,14 +73,23 @@ class Auth {
 
     showAuth() {
         this.hideSplash();
-        // Allow new API requests (login/register) after session expiry
-        api._sessionExpired = false;
         document.getElementById('auth-screen').classList.add('active');
         document.getElementById('app-screen').classList.remove('active');
 
-        // Clear forms
+        // Clear form and restore remembered email
         document.getElementById('login-form').reset();
-        document.getElementById('register-form').reset();
+        this.loadRememberedEmail();
+    }
+
+    loadRememberedEmail() {
+        const saved = localStorage.getItem('remembered_email');
+        const emailInput = document.getElementById('login-email');
+        const rememberCheck = document.getElementById('remember-email');
+
+        if (saved && emailInput) {
+            emailInput.value = saved;
+            if (rememberCheck) rememberCheck.checked = true;
+        }
     }
 
     showApp() {

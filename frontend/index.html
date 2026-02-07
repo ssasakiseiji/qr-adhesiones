@@ -90,13 +90,6 @@
             <p>Sistema de gestión de vouchers de comida</p>
           </div>
 
-          <div class="auth-tabs">
-            <button class="auth-tab active" data-tab="login">
-              Iniciar Sesión
-            </button>
-            <button class="auth-tab" data-tab="register">Registrarse</button>
-          </div>
-
           <!-- Login Form -->
           <form id="login-form" class="auth-form active">
             <div class="form-group">
@@ -107,34 +100,16 @@
               <label for="login-password">Contraseña</label>
               <input type="password" id="login-password" required autocomplete="current-password" />
             </div>
+            <div class="remember-me">
+              <label class="checkbox-label">
+                <input type="checkbox" id="remember-email" />
+                <span>Recordar email</span>
+              </label>
+            </div>
             <button type="submit" class="btn btn-primary">
               Iniciar Sesión
             </button>
             <div id="login-error" class="error-message"></div>
-          </form>
-
-          <!-- Register Form -->
-          <form id="register-form" class="auth-form">
-            <div class="form-group">
-              <label for="register-username">Usuario</label>
-              <input type="text" id="register-username" required autocomplete="username" />
-            </div>
-            <div class="form-group">
-              <label for="register-email">Email</label>
-              <input type="email" id="register-email" required inputmode="email" autocomplete="email" />
-            </div>
-            <div class="form-group">
-              <label for="register-password">Contraseña</label>
-              <input
-                type="password"
-                id="register-password"
-                required
-                minlength="6"
-                autocomplete="new-password"
-              />
-            </div>
-            <button type="submit" class="btn btn-primary">Registrarse</button>
-            <div id="register-error" class="error-message"></div>
           </form>
         </div>
       </div>

@@ -29,30 +29,37 @@ class App {
 
     async onAppReady() {
         this.showSplash(true);
+
+        // Failsafe: hide splash after 10s no matter what
+        const failsafe = setTimeout(() => {
+            console.warn('Splash failsafe triggered');
+            this.showSplash(false);
+        }, 10000);
+
         try {
             if (!this.initialized) {
                 await this.initializeApp();
             } else {
                 await this.reloadData();
             }
+        } catch (error) {
+            console.error('App ready error:', error);
         } finally {
+            clearTimeout(failsafe);
             this.showSplash(false);
         }
     }
 
     async initializeApp() {
-        try {
-            // Initialize all modules (event listeners + first data load)
-            await activities.init();
+        // Initialize all modules (event listeners only once)
+        if (!this.initialized) {
             vouchers.init();
             scanner.init();
             metrics.init();
             activityDetail.init();
             qrTemplate.init();
             logoManager.init();
-
-            // Load initial data
-            await this.loadDashboard();
+            activities.initEventListeners();
 
             // Listen for activity changes
             window.addEventListener('activity-changed', () => {
@@ -77,22 +84,20 @@ class App {
             window.addEventListener('navigate-view', (e) => {
                 this.navigateToView(e.detail.view);
             });
-
-            this.initialized = true;
-        } catch (error) {
-            console.error('Error initializing app:', error);
         }
+
+        // Load data (can fail if token is rejected by server)
+        await activities.loadActivities();
+        await this.loadDashboard();
+
+        this.initialized = true;
     }
 
     async reloadData() {
-        try {
-            // Reload activities (state was reset by session-reset event)
-            await activities.loadActivities();
-            // Navigate to dashboard (which also loads dashboard data)
-            await this.navigateToView('dashboard');
-        } catch (error) {
-            console.error('Error reloading data:', error);
-        }
+        // Reload activities (state was reset by session-reset event)
+        await activities.loadActivities();
+        // Navigate to dashboard (which also loads dashboard data)
+        await this.navigateToView('dashboard');
     }
 
     showSplash(show) {

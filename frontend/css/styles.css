@@ -295,6 +295,26 @@ body {
   background: rgba(99, 102, 241, 0.1);
 }
 
+.remember-me {
+  margin: var(--spacing-sm) 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
 .error-message {
   color: var(--error);
   font-size: 0.875rem;
@@ -645,12 +665,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.3s ease;
 }
 
 .splash-screen.hidden {
-  opacity: 0;
-  pointer-events: none;
+  display: none;
 }
 
 .splash-content {

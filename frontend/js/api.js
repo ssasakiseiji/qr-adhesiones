@@ -69,8 +69,9 @@ class API {
         }
     }
 
-    // Auth endpoints
+    // Auth endpoints (bypass session expired check)
     async register(username, email, password) {
+        this._sessionExpired = false;
         return this.request('/auth/register', {
             method: 'POST',
             body: JSON.stringify({ username, email, password })
@@ -78,6 +79,7 @@ class API {
     }
 
     async login(email, password) {
+        this._sessionExpired = false;
         return this.request('/auth/login', {
             method: 'POST',
             body: JSON.stringify({ email, password })
