@@ -546,9 +546,21 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/html5-qrcode" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" defer></script>
+    <!-- Failsafe: if JS modules fail to load, hide splash and show login -->
+    <script>
+      setTimeout(function() {
+        var s = document.getElementById('splash-screen');
+        if (s && !s.classList.contains('hidden')) {
+          s.classList.add('hidden');
+          var a = document.getElementById('auth-screen');
+          if (a) a.classList.add('active');
+        }
+      }, 8000);
+    </script>
+
+    <!-- Scripts (async so they don't block module loading) -->
+    <script src="https://unpkg.com/html5-qrcode" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" async></script>
     <script type="module" src="js/app.js?v=2"></script>
   </body>
 </html>
