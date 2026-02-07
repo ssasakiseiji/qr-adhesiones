@@ -104,10 +104,14 @@ class API {
         return this.request(endpoint);
     }
 
-    async createVoucher(activityId, customerName, amount) {
+    async createVoucher(activityId, customerName, amount, items = null, pickupDate = null, pickupTime = null) {
+        const body = { activityId, customerName, amount };
+        if (items) body.items = items;
+        if (pickupDate) body.pickupDate = pickupDate;
+        if (pickupTime) body.pickupTime = pickupTime;
         return this.request('/vouchers', {
             method: 'POST',
-            body: JSON.stringify({ activityId, customerName, amount })
+            body: JSON.stringify(body)
         });
     }
 
@@ -139,6 +143,31 @@ class API {
 
     async deleteLogo(id) {
         return this.request(`/logos/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // Product endpoints
+    async getProducts(activityId) {
+        return this.request(`/products/activity/${activityId}`);
+    }
+
+    async createProduct(activityId, name, price) {
+        return this.request(`/products/activity/${activityId}`, {
+            method: 'POST',
+            body: JSON.stringify({ name, price })
+        });
+    }
+
+    async updateProduct(id, data) {
+        return this.request(`/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async deleteProduct(id) {
+        return this.request(`/products/${id}`, {
             method: 'DELETE'
         });
     }

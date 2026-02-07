@@ -92,7 +92,7 @@ const deleteActivity = async (req, res) => {
 const updateTemplate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { templateTitle, templateProductName, templateBgColor, templateLogoId } = req.body;
+    const { templateTitle, templateProductName, templateBgColor, templateTextColor, templateLogoId } = req.body;
 
     const activity = await Activity.findByPk(id);
     if (!activity) {
@@ -110,6 +110,7 @@ const updateTemplate = async (req, res) => {
       templateTitle: templateTitle !== undefined ? templateTitle : activity.templateTitle,
       templateProductName: templateProductName !== undefined ? templateProductName : activity.templateProductName,
       templateBgColor: templateBgColor !== undefined ? templateBgColor : activity.templateBgColor,
+      templateTextColor: templateTextColor !== undefined ? templateTextColor : activity.templateTextColor,
       templateLogoId: templateLogoId !== undefined ? templateLogoId : activity.templateLogoId,
     });
 

@@ -11,6 +11,7 @@ const activityRoutes = require('./routes/activities');
 const voucherRoutes = require('./routes/vouchers');
 const metricsRoutes = require('./routes/metrics');
 const logoRoutes = require('./routes/logos');
+const productRoutes = require('./routes/products');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,6 +46,7 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/vouchers', voucherRoutes);
 app.use('/api/metrics', metricsRoutes);
 app.use('/api/logos', logoRoutes);
+app.use('/api/products', productRoutes);
 
 // 404 handler
 app.use((req, res) => {

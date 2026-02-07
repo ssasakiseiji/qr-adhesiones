@@ -38,6 +38,14 @@ const Activity = sequelize.define('Activity', {
       is: /^#[0-9A-Fa-f]{6}$/
     }
   },
+  templateTextColor: {
+    type: DataTypes.STRING(7),
+    allowNull: true,
+    defaultValue: '#ffffff',
+    validate: {
+      isIn: [['#ffffff', '#000000']]
+    }
+  },
   templateLogoId: {
     type: DataTypes.UUID,
     allowNull: true,

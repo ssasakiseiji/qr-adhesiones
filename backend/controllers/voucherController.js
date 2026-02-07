@@ -18,7 +18,7 @@ const generateQRCode = async (data) => {
 
 const createVoucher = async (req, res) => {
   try {
-    const { activityId, customerName, amount } = req.body;
+    const { activityId, customerName, amount, items, pickupDate, pickupTime } = req.body;
 
     // Verify activity exists
     const activity = await Activity.findByPk(activityId);
@@ -29,7 +29,7 @@ const createVoucher = async (req, res) => {
     // Generate unique QR code data
     const uniqueId = crypto.randomBytes(16).toString('hex');
     const qrData = `VOUCHER:${uniqueId}:${activityId}:${Date.now()}`;
-    
+
     // Generate QR code image
     const qrCodeImage = await generateQRCode(qrData);
 
@@ -38,6 +38,9 @@ const createVoucher = async (req, res) => {
       activityId,
       customerName,
       amount,
+      items: items || null,
+      pickupDate: pickupDate || null,
+      pickupTime: pickupTime || null,
       qrCode: qrData
     });
 
@@ -48,6 +51,9 @@ const createVoucher = async (req, res) => {
         activityId: voucher.activityId,
         customerName: voucher.customerName,
         amount: voucher.amount,
+        items: voucher.items,
+        pickupDate: voucher.pickupDate,
+        pickupTime: voucher.pickupTime,
         qrCode: qrData,
         qrCodeImage,
         isRedeemed: voucher.isRedeemed,

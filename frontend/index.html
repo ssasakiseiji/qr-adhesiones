@@ -203,8 +203,19 @@
               <label for="customer-name">Nombre del Cliente</label>
               <input type="text" id="customer-name" required autocomplete="name" />
             </div>
-            <div class="form-group">
-              <label for="voucher-amount">Monto ($)</label>
+
+            <!-- Product picker (shown when activity has products) -->
+            <div id="product-picker" class="product-picker hidden">
+              <label>Productos</label>
+              <div id="product-picker-list" class="product-picker-list"></div>
+            </div>
+
+            <!-- Amount section -->
+            <div class="form-group" id="amount-group">
+              <div class="amount-header">
+                <label for="voucher-amount">Total ($)</label>
+                <button type="button" id="toggle-edit-total" class="btn-link hidden" title="Editar total manualmente">Editar</button>
+              </div>
               <input
                 type="number"
                 id="voucher-amount"
@@ -213,6 +224,14 @@
                 required
                 inputmode="decimal"
               />
+            </div>
+            <div class="form-group">
+              <label for="voucher-pickup-date">Fecha de Retiro (opcional)</label>
+              <input type="date" id="voucher-pickup-date" />
+            </div>
+            <div class="form-group">
+              <label for="voucher-pickup-time">Hora de Retiro (opcional)</label>
+              <input type="time" id="voucher-pickup-time" />
             </div>
             <button type="submit" class="btn btn-primary">
               Generar Voucher
@@ -307,6 +326,25 @@
           </div>
 
           <div id="detail-metrics" class="stats-grid"></div>
+
+          <!-- Product Management Section -->
+          <div class="products-section">
+            <div class="section-header">
+              <h3>Productos</h3>
+              <button id="add-product-btn" class="btn btn-primary btn-sm">
+                <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg> Agregar
+              </button>
+            </div>
+            <div id="add-product-form" class="add-product-form hidden">
+              <div class="product-form-row">
+                <input type="text" id="new-product-name" placeholder="Nombre del producto" class="product-input" />
+                <input type="number" id="new-product-price" placeholder="Precio" step="0.01" min="0" class="product-input product-price-input" inputmode="decimal" />
+                <button id="save-product-btn" class="btn btn-primary btn-sm">Guardar</button>
+                <button id="cancel-product-btn" class="btn btn-outline btn-sm">Cancelar</button>
+              </div>
+            </div>
+            <div id="products-list" class="products-list"></div>
+          </div>
 
           <div class="vouchers-table" style="margin-top: var(--spacing-lg)">
             <h3>Ventas</h3>
@@ -404,6 +442,20 @@
               <input type="color" id="template-bg-color" value="#1e293b" class="color-picker-swatch" />
               <input type="text" id="template-bg-color-text" value="#1e293b" maxlength="7" class="color-picker-text" />
             </div>
+          </div>
+          <div class="form-group">
+            <label>Color del Texto</label>
+            <div class="text-color-toggle">
+              <button type="button" class="text-color-btn active" data-color="#ffffff"
+                      style="background:#1e293b;color:#ffffff;border:2px solid var(--primary);">
+                Blanco
+              </button>
+              <button type="button" class="text-color-btn" data-color="#000000"
+                      style="background:#e2e8f0;color:#000000;border:2px solid transparent;">
+                Negro
+              </button>
+            </div>
+            <input type="hidden" id="template-text-color" value="#ffffff" />
           </div>
           <div class="form-group">
             <label>Logo</label>

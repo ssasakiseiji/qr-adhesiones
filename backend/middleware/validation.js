@@ -60,6 +60,18 @@ const voucherValidation = [
   body('amount')
     .isFloat({ min: 0 })
     .withMessage('Amount must be a positive number'),
+  body('items')
+    .optional({ values: 'null' })
+    .isArray()
+    .withMessage('Items must be an array'),
+  body('pickupDate')
+    .optional({ values: 'null' })
+    .isDate()
+    .withMessage('Pickup date must be a valid date (YYYY-MM-DD)'),
+  body('pickupTime')
+    .optional({ values: 'null' })
+    .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .withMessage('Pickup time must be in HH:mm format'),
   validate
 ];
 
@@ -81,6 +93,17 @@ const logoValidation = [
   validate
 ];
 
+const productValidation = [
+  body('name')
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Product name must be between 2 and 100 characters'),
+  body('price')
+    .isFloat({ min: 0 })
+    .withMessage('Price must be a positive number'),
+  validate
+];
+
 const templateValidation = [
   body('templateTitle')
     .optional()
@@ -96,6 +119,10 @@ const templateValidation = [
     .optional()
     .matches(/^#[0-9A-Fa-f]{6}$/)
     .withMessage('Background color must be a valid hex color'),
+  body('templateTextColor')
+    .optional()
+    .isIn(['#ffffff', '#000000'])
+    .withMessage('Text color must be #ffffff or #000000'),
   body('templateLogoId')
     .optional({ values: 'null' })
     .isUUID()
@@ -110,5 +137,6 @@ module.exports = {
   voucherValidation,
   uuidValidation,
   logoValidation,
+  productValidation,
   templateValidation
 };

@@ -10,6 +10,7 @@ import logoManager from './logoManager.js';
 class App {
     constructor() {
         this.currentView = 'dashboard';
+        this.initialized = false;
         this.init();
     }
 
@@ -19,16 +20,25 @@ class App {
 
         // Initialize modules when app is ready
         window.addEventListener('app-ready', async () => {
-            await this.initializeApp();
+            await this.onAppReady();
         });
 
         // Navigation
         this.initNavigation();
     }
 
+    async onAppReady() {
+        if (!this.initialized) {
+            await this.initializeApp();
+        } else {
+            // Re-authentication: just reload data
+            await this.reloadData();
+        }
+    }
+
     async initializeApp() {
         try {
-            // Initialize all modules
+            // Initialize all modules (event listeners + first data load)
             await activities.init();
             vouchers.init();
             scanner.init();
@@ -63,8 +73,19 @@ class App {
             window.addEventListener('navigate-view', (e) => {
                 this.navigateToView(e.detail.view);
             });
+
+            this.initialized = true;
         } catch (error) {
             console.error('Error initializing app:', error);
+        }
+    }
+
+    async reloadData() {
+        try {
+            await activities.loadActivities();
+            this.navigateToView('dashboard');
+        } catch (error) {
+            console.error('Error reloading data:', error);
         }
     }
 
@@ -108,6 +129,7 @@ class App {
                 break;
             case 'sales':
                 vouchers.resetForm();
+                await vouchers.loadProductsForActivity();
                 break;
             case 'scanner':
                 await scanner.startScanner();
@@ -133,6 +155,9 @@ class App {
     async onActivityChanged() {
         if (this.currentView === 'dashboard') {
             await this.loadDashboard();
+        }
+        if (this.currentView === 'sales') {
+            await vouchers.loadProductsForActivity();
         }
     }
 

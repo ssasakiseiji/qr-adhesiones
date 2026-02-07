@@ -70,6 +70,14 @@ class Scanner {
         }
     }
 
+    renderItemsHtml(items) {
+        if (!items || items.length === 0) return '';
+        const lines = items.map(i =>
+            `<span>${i.quantity}x ${i.productName} — $${i.subtotal.toFixed(2)}</span>`
+        ).join('');
+        return `<div class="scan-items"><strong>Productos:</strong><div class="scan-items-list">${lines}</div></div>`;
+    }
+
     displayScanResult(response) {
         const { voucher, canRedeem } = response;
         const resultContainer = document.getElementById('scan-result');
@@ -81,13 +89,16 @@ class Scanner {
         document.getElementById('scanner-container').style.display = 'none';
         resultContainer.classList.remove('hidden');
 
+        const itemsHtml = this.renderItemsHtml(voucher.items);
+
         if (voucher.isRedeemed) {
             statusEl.innerHTML = `${icon('warning')} Voucher Ya Retirado`;
             statusEl.style.color = 'var(--warning)';
-            
+
             detailsEl.innerHTML = `
                 <p><strong>Cliente:</strong> ${voucher.customerName}</p>
                 <p><strong>Monto:</strong> $${voucher.amount}</p>
+                ${itemsHtml}
                 <p><strong>Retirado el:</strong> ${new Date(voucher.redeemedAt).toLocaleString()}</p>
             `;
 
@@ -99,10 +110,11 @@ class Scanner {
         } else {
             statusEl.innerHTML = `${icon('check')} Voucher Válido`;
             statusEl.style.color = 'var(--success)';
-            
+
             detailsEl.innerHTML = `
                 <p><strong>Cliente:</strong> ${voucher.customerName}</p>
                 <p><strong>Monto:</strong> $${voucher.amount}</p>
+                ${itemsHtml}
                 <p><strong>Actividad:</strong> ${voucher.activity.name}</p>
                 <p><strong>Creado:</strong> ${new Date(voucher.createdAt).toLocaleString()}</p>
             `;

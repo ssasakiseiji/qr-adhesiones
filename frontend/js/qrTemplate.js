@@ -43,6 +43,20 @@ class QrTemplate {
         document.getElementById('template-title').addEventListener('input', () => this.updatePreview());
         document.getElementById('template-product').addEventListener('input', () => this.updatePreview());
 
+        // Text color toggle
+        document.querySelectorAll('.text-color-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.text-color-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'transparent';
+                });
+                e.currentTarget.classList.add('active');
+                e.currentTarget.style.borderColor = 'var(--primary)';
+                document.getElementById('template-text-color').value = e.currentTarget.dataset.color;
+                this.updatePreview();
+            });
+        });
+
         // Logo select callback triggers preview
         logoManager.onSelectCallback = () => this.updatePreview();
 
@@ -81,6 +95,15 @@ class QrTemplate {
         document.getElementById('template-bg-color').value = bgColor;
         document.getElementById('template-bg-color-text').value = bgColor;
 
+        // Populate text color toggle
+        const textColor = this.currentActivity.templateTextColor || '#ffffff';
+        document.getElementById('template-text-color').value = textColor;
+        document.querySelectorAll('.text-color-btn').forEach(btn => {
+            const isActive = btn.dataset.color === textColor;
+            btn.classList.toggle('active', isActive);
+            btn.style.borderColor = isActive ? 'var(--primary)' : 'transparent';
+        });
+
         // Load logos and select the current one
         await logoManager.loadLogos();
         logoManager.renderLogoSelector(this.currentActivity.templateLogoId);
@@ -99,6 +122,7 @@ class QrTemplate {
             templateTitle: document.getElementById('template-title').value.trim(),
             templateProductName: document.getElementById('template-product').value.trim(),
             templateBgColor: document.getElementById('template-bg-color').value,
+            templateTextColor: document.getElementById('template-text-color').value,
             templateLogoId: logoManager.selectedLogoId || null
         };
 
@@ -128,12 +152,16 @@ class QrTemplate {
             templateTitle: document.getElementById('template-title').value || 'Titulo del Evento',
             templateProductName: document.getElementById('template-product').value || 'Producto',
             templateBgColor: document.getElementById('template-bg-color').value || '#1e293b',
+            templateTextColor: document.getElementById('template-text-color').value || '#ffffff',
             templateLogo: logoManager.getSelectedLogo()
         };
 
         const sampleVoucher = {
             customerName: 'Juan Perez',
             amount: '500',
+            items: null,
+            pickupDate: '2026-03-15',
+            pickupTime: '12:00',
             createdAt: new Date().toISOString()
         };
 
@@ -192,67 +220,44 @@ class QrTemplate {
         } catch (e) { /* fallback to sans-serif */ }
 
         const bgColor = template.templateBgColor || '#1e293b';
+        const textColor = template.templateTextColor || '#ffffff';
 
-        // 1. Background
+        // 1. Solid background - no bands, no decorative elements
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, W, H);
 
-        // 2. Decorative top band
-        ctx.fillStyle = this.lightenColor(bgColor, 10);
-        ctx.fillRect(0, 0, W, 200);
+        let currentY = 60;
 
-        // 3. Logo
+        // 2. Logo (prominent, 180px)
         if (template.templateLogo && template.templateLogo.svgContent) {
             try {
-                const logoDataUrl = this.prepareSvgForCanvas(template.templateLogo.svgContent, 140, 140);
+                const logoSize = 180;
+                const logoDataUrl = this.prepareSvgForCanvas(template.templateLogo.svgContent, logoSize, logoSize);
                 const logoImg = await this.loadImage(logoDataUrl);
-                const logoX = (W - 140) / 2;
-                ctx.drawImage(logoImg, logoX, 30, 140, 140);
+                ctx.drawImage(logoImg, (W - logoSize) / 2, currentY, logoSize, logoSize);
+                currentY += logoSize + 30;
             } catch (e) {
                 console.warn('Could not render logo:', e);
+                currentY += 30;
             }
+        } else {
+            currentY += 30;
         }
 
-        // 4. Divider
-        this.drawDivider(ctx, W, 220);
-
-        // 5. Title
-        ctx.fillStyle = '#ffffff';
+        // 3. Title
+        ctx.fillStyle = textColor;
         ctx.font = 'bold 36px Inter, sans-serif';
         ctx.textAlign = 'center';
-        this.drawWrappedText(ctx, template.templateTitle || template.name || '', W / 2, 275, W - 120, 42);
+        const titleText = template.templateTitle || template.name || '';
+        this.drawWrappedText(ctx, titleText, W / 2, currentY, W - 120, 42);
+        const titleLines = this.measureWrappedLines(ctx, titleText, W - 120);
+        currentY += titleLines * 42 + 40;
 
-        // 6. Divider
-        this.drawDivider(ctx, W, 320);
-
-        // 7. "TITULAR" label + name
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font = '20px Inter, sans-serif';
-        ctx.fillText('TITULAR', W / 2, 365);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '28px Inter, sans-serif';
-        this.drawWrappedText(ctx, voucher.customerName || '', W / 2, 400, W - 120, 34);
-
-        // 8. "PRODUCTO" label + amount + product
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.font = '20px Inter, sans-serif';
-        ctx.fillText('PRODUCTO', W / 2, 460);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 32px Inter, sans-serif';
-        const amountStr = `$${voucher.amount}`;
-        const productStr = template.templateProductName ? ` - ${template.templateProductName}` : '';
-        this.drawWrappedText(ctx, amountStr + productStr, W / 2, 500, W - 100, 38);
-
-        // 9. Divider
-        this.drawDivider(ctx, W, 555);
-
-        // 10. QR code with white rounded background
-        const qrSize = 300;
+        // 4. QR code - prominent, bigger (350px), white rounded box
+        const qrSize = 350;
         const qrPad = 20;
         const qrBoxX = (W - qrSize - qrPad * 2) / 2;
-        const qrBoxY = 585;
+        const qrBoxY = currentY;
 
         ctx.fillStyle = '#ffffff';
         this.roundRect(ctx, qrBoxX, qrBoxY, qrSize + qrPad * 2, qrSize + qrPad * 2, 16);
@@ -263,24 +268,67 @@ class QrTemplate {
                 const qrImg = await this.loadImage(qrCodeDataUrl);
                 ctx.drawImage(qrImg, qrBoxX + qrPad, qrBoxY + qrPad, qrSize, qrSize);
             } catch (e) {
-                // Draw placeholder
                 ctx.fillStyle = '#cccccc';
                 ctx.font = '16px Inter, sans-serif';
                 ctx.fillText('QR Code', W / 2, qrBoxY + qrSize / 2 + qrPad);
             }
         }
 
-        // 11. Footer
-        ctx.fillStyle = 'rgba(255,255,255,0.35)';
-        ctx.font = '16px Inter, sans-serif';
-        const dateStr = voucher.createdAt
-            ? new Date(voucher.createdAt).toLocaleDateString('es-AR')
-            : new Date().toLocaleDateString('es-AR');
-        ctx.fillText(`Voucher generado el ${dateStr}`, W / 2, 970);
+        currentY = qrBoxY + qrSize + qrPad * 2 + 40;
 
-        // 12. Decorative bottom band
-        ctx.fillStyle = this.lightenColor(bgColor, 10);
-        ctx.fillRect(0, H - 40, W, 40);
+        // 5. Products (items list or template product name)
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'center';
+        const items = voucher.items && voucher.items.length > 0 ? voucher.items : null;
+
+        if (items) {
+            ctx.font = '26px Inter, sans-serif';
+            for (const item of items) {
+                const itemText = `${item.quantity}x ${item.productName}`;
+                ctx.fillText(itemText, W / 2, currentY);
+                currentY += 34;
+            }
+            currentY += 10;
+        } else if (template.templateProductName) {
+            ctx.font = '28px Inter, sans-serif';
+            this.drawWrappedText(ctx, template.templateProductName, W / 2, currentY, W - 120, 34);
+            const productLines = this.measureWrappedLines(ctx, template.templateProductName, W - 120);
+            currentY += productLines * 34 + 20;
+        }
+
+        // 6. Voucher value
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 40px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`$${voucher.amount}`, W / 2, currentY);
+        currentY += 50;
+
+        // 7. Customer name
+        ctx.fillStyle = textColor;
+        ctx.font = '28px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        this.drawWrappedText(ctx, voucher.customerName || '', W / 2, currentY, W - 120, 34);
+        const nameLines = this.measureWrappedLines(ctx, voucher.customerName || '', W - 120);
+        currentY += nameLines * 34 + 20;
+
+        // 8. Pickup date and time (optional)
+        if (voucher.pickupDate || voucher.pickupTime) {
+            ctx.font = '24px Inter, sans-serif';
+            ctx.fillStyle = textColor;
+            let pickupStr = '';
+            if (voucher.pickupDate) {
+                const parts = voucher.pickupDate.split('-');
+                if (parts.length === 3) {
+                    pickupStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                } else {
+                    pickupStr = voucher.pickupDate;
+                }
+            }
+            if (voucher.pickupTime) {
+                pickupStr += (pickupStr ? ' - ' : '') + voucher.pickupTime + ' hs';
+            }
+            ctx.fillText(pickupStr, W / 2, currentY);
+        }
     }
 
     // ========================
@@ -310,14 +358,16 @@ class QrTemplate {
         }
 
         const { jsPDF } = window.jspdf;
+        const pdfW = 100;
+        const pdfH = pdfW * (canvas.height / canvas.width);
         const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
-            format: [100, 150]
+            format: [pdfW, pdfH]
         });
 
         const imgData = canvas.toDataURL('image/png');
-        pdf.addImage(imgData, 'PNG', 0, 0, 100, 150);
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
         pdf.save(filename);
     }
 
@@ -359,14 +409,6 @@ class QrTemplate {
         return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(serialized)));
     }
 
-    lightenColor(hex, percent) {
-        const num = parseInt((hex || '#1e293b').replace('#', ''), 16);
-        const r = Math.min(255, ((num >> 16) & 0xFF) + Math.round(255 * percent / 100));
-        const g = Math.min(255, ((num >> 8) & 0xFF) + Math.round(255 * percent / 100));
-        const b = Math.min(255, (num & 0xFF) + Math.round(255 * percent / 100));
-        return `rgb(${r},${g},${b})`;
-    }
-
     roundRect(ctx, x, y, w, h, radius) {
         ctx.beginPath();
         ctx.moveTo(x + radius, y);
@@ -379,15 +421,6 @@ class QrTemplate {
         ctx.lineTo(x, y + radius);
         ctx.quadraticCurveTo(x, y, x + radius, y);
         ctx.closePath();
-    }
-
-    drawDivider(ctx, canvasWidth, y) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(60, y);
-        ctx.lineTo(canvasWidth - 60, y);
-        ctx.stroke();
     }
 
     drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
@@ -407,6 +440,25 @@ class QrTemplate {
             }
         }
         ctx.fillText(line, x, currentY);
+    }
+
+    measureWrappedLines(ctx, text, maxWidth) {
+        if (!text) return 1;
+        const words = text.split(' ');
+        let line = '';
+        let lineCount = 1;
+
+        for (const word of words) {
+            const testLine = line ? line + ' ' + word : word;
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && line) {
+                line = word;
+                lineCount++;
+            } else {
+                line = testLine;
+            }
+        }
+        return lineCount;
     }
 
     generatePlaceholderQR() {

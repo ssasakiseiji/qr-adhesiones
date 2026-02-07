@@ -3,6 +3,7 @@ const User = require('./User');
 const Activity = require('./Activity');
 const Voucher = require('./Voucher');
 const Logo = require('./Logo');
+const Product = require('./Product');
 
 // Define associations
 Activity.hasMany(Voucher, {
@@ -27,6 +28,17 @@ Logo.hasMany(Activity, {
   as: 'activities'
 });
 
+Activity.hasMany(Product, {
+  foreignKey: 'activityId',
+  as: 'products',
+  onDelete: 'CASCADE'
+});
+
+Product.belongsTo(Activity, {
+  foreignKey: 'activityId',
+  as: 'activity'
+});
+
 const syncDatabase = async () => {
   try {
     await sequelize.authenticate();
@@ -46,5 +58,6 @@ module.exports = {
   Activity,
   Voucher,
   Logo,
+  Product,
   syncDatabase
 };
