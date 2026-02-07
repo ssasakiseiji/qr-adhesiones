@@ -1,12 +1,12 @@
-import auth from './auth.js?v=3';
-import activities from './activities.js?v=3';
-import vouchers from './vouchers.js?v=3';
-import scanner from './scanner.js?v=3';
-import metrics from './metrics.js?v=3';
-import activityDetail from './activityDetail.js?v=3';
-import qrTemplate from './qrTemplate.js?v=3';
-import logoManager from './logoManager.js?v=3';
-import users from './users.js?v=3';
+import auth from './auth.js?v=4';
+import activities from './activities.js?v=4';
+import vouchers from './vouchers.js?v=4';
+import scanner from './scanner.js?v=4';
+import metrics from './metrics.js?v=4';
+import activityDetail from './activityDetail.js?v=4';
+import qrTemplate from './qrTemplate.js?v=4';
+import logoManager from './logoManager.js?v=4';
+import users from './users.js?v=4';
 
 class App {
     constructor() {
@@ -165,12 +165,16 @@ class App {
         const salesNav = document.querySelector('.nav-item[data-view="sales"]');
         const activitiesNav = document.querySelector('.nav-item[data-view="activities"]');
 
+        const metricsNav = document.querySelector('.nav-item[data-view="metrics"]');
+
         if (role === 'esbirro') {
             salesNav.classList.add('hidden');
             activitiesNav.classList.add('hidden');
+            if (metricsNav) metricsNav.classList.add('hidden');
         } else {
             salesNav.classList.remove('hidden');
             activitiesNav.classList.remove('hidden');
+            if (metricsNav) metricsNav.classList.remove('hidden');
         }
 
         // Quick action "Nueva Venta" in dashboard

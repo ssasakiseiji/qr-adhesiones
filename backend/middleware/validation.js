@@ -87,8 +87,8 @@ const voucherValidation = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Customer name must be between 2 and 100 characters'),
   body('amount')
-    .isFloat({ min: 0 })
-    .withMessage('Amount must be a positive number'),
+    .isInt({ min: 0 })
+    .withMessage('Amount must be a positive integer'),
   body('items')
     .optional({ values: 'null' })
     .isArray()
@@ -120,8 +120,8 @@ const productValidation = [
     .isLength({ min: 2, max: 100 })
     .withMessage('Product name must be between 2 and 100 characters'),
   body('price')
-    .isFloat({ min: 0 })
-    .withMessage('Price must be a positive number'),
+    .isInt({ min: 0 })
+    .withMessage('Price must be a positive integer'),
   validate
 ];
 
@@ -172,6 +172,17 @@ const templateValidation = [
   validate
 ];
 
+const costValidation = [
+  body('description')
+    .trim()
+    .isLength({ min: 2, max: 200 })
+    .withMessage('Cost description must be between 2 and 200 characters'),
+  body('amount')
+    .isInt({ min: 0 })
+    .withMessage('Amount must be a positive integer'),
+  validate
+];
+
 module.exports = {
   loginValidation,
   createUserValidation,
@@ -181,5 +192,6 @@ module.exports = {
   uuidValidation,
   logoValidation,
   productValidation,
-  templateValidation
+  templateValidation,
+  costValidation
 };

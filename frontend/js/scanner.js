@@ -1,5 +1,5 @@
-import api from './api.js?v=3';
-import { icon } from './icons.js?v=3';
+import api from './api.js?v=4';
+import { icon } from './icons.js?v=4';
 
 class Scanner {
     constructor() {
@@ -8,7 +8,18 @@ class Scanner {
     }
 
     init() {
-        // Scanner will be initialized when view is shown
+        // Gallery import
+        document.getElementById('gallery-scan-btn').addEventListener('click', () => {
+            document.getElementById('gallery-file-input').click();
+        });
+
+        document.getElementById('gallery-file-input').addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                this.scanFromFile(e.target.files[0]);
+            }
+            // Reset so same file can be selected again
+            e.target.value = '';
+        });
     }
 
     async startScanner() {
@@ -37,7 +48,7 @@ class Scanner {
             this.isScanning = true;
         } catch (error) {
             console.error('Error starting scanner:', error);
-            this.showToast('Error al iniciar la cámara', 'error');
+            this.showToast('Error al iniciar la camara', 'error');
         }
     }
 
@@ -53,6 +64,25 @@ class Scanner {
         }
     }
 
+    async scanFromFile(file) {
+        if (!file) return;
+
+        try {
+            await this.stopScanner();
+            this.showLoading(true, 'Leyendo imagen...');
+
+            const html5QrCode = new Html5Qrcode("qr-reader");
+            const result = await html5QrCode.scanFile(file, false);
+            await html5QrCode.clear();
+            await this.onScanSuccess(result);
+        } catch (error) {
+            console.error('Error scanning file:', error);
+            this.displayScanError('No se pudo leer un codigo QR de la imagen');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
     async onScanSuccess(qrCode) {
         // Stop scanning immediately
         await this.stopScanner();
@@ -60,7 +90,7 @@ class Scanner {
         try {
             this.showLoading(true);
             const response = await api.scanQRCode(qrCode);
-            
+
             this.displayScanResult(response);
         } catch (error) {
             console.error('Error scanning QR:', error);
@@ -108,7 +138,7 @@ class Scanner {
                 </button>
             `;
         } else {
-            statusEl.innerHTML = `${icon('check')} Voucher Válido`;
+            statusEl.innerHTML = `${icon('check')} Voucher Valido`;
             statusEl.style.color = 'var(--success)';
 
             detailsEl.innerHTML = `
@@ -120,7 +150,7 @@ class Scanner {
             `;
 
             actionsEl.innerHTML = `
-                <button class="btn btn-primary" onclick="window.scanner.redeemVoucher('${voucher.id}')">
+                <button class="btn btn-primary" id="redeem-btn" onclick="window.scanner.redeemVoucher('${voucher.id}')">
                     Marcar como Retirado
                 </button>
                 <button class="btn btn-secondary" onclick="window.scanner.resetScanner()">
@@ -141,9 +171,9 @@ class Scanner {
 
         statusEl.innerHTML = `${icon('error')} Error`;
         statusEl.style.color = 'var(--error)';
-        
+
         detailsEl.innerHTML = `<p>${message}</p>`;
-        
+
         actionsEl.innerHTML = `
             <button class="btn btn-secondary" onclick="window.scanner.resetScanner()">
                 Intentar de Nuevo
@@ -152,15 +182,22 @@ class Scanner {
     }
 
     async redeemVoucher(voucherId) {
+        // Show processing state on the button
+        const redeemBtn = document.getElementById('redeem-btn');
+        if (redeemBtn) {
+            redeemBtn.disabled = true;
+            redeemBtn.textContent = 'Procesando...';
+        }
+
         try {
-            this.showLoading(true);
+            this.showLoading(true, 'Procesando...');
             await api.redeemVoucher(voucherId);
-            
+
             this.showToast('Voucher marcado como retirado', 'success');
-            
+
             // Trigger event
             window.dispatchEvent(new Event('voucher-redeemed'));
-            
+
             // Reset scanner after short delay
             setTimeout(() => {
                 this.resetScanner();
@@ -168,6 +205,11 @@ class Scanner {
         } catch (error) {
             console.error('Error redeeming voucher:', error);
             this.showToast('Error al marcar voucher', 'error');
+            // Restore button
+            if (redeemBtn) {
+                redeemBtn.disabled = false;
+                redeemBtn.textContent = 'Marcar como Retirado';
+            }
         } finally {
             this.showLoading(false);
         }
@@ -179,8 +221,10 @@ class Scanner {
         this.startScanner();
     }
 
-    showLoading(show) {
+    showLoading(show, text = '') {
         document.getElementById('loading-overlay').classList.toggle('hidden', !show);
+        const loadingText = document.getElementById('loading-text');
+        if (loadingText) loadingText.textContent = text;
     }
 
     showToast(message, type = 'info') {
@@ -188,9 +232,9 @@ class Scanner {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         toast.textContent = message;
-        
+
         container.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.remove();
         }, 3000);

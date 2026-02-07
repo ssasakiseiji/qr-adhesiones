@@ -23,7 +23,7 @@ const Voucher = sequelize.define('Voucher', {
     }
   },
   amount: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
       min: 0

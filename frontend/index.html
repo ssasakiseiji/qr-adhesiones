@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/styles.css?v=3" />
+    <link rel="stylesheet" href="css/styles.css?v=4" />
   </head>
   <body>
     <!-- Splash / Loading Screen -->
@@ -174,33 +174,40 @@
       <main class="app-main">
         <!-- Dashboard View -->
         <div id="dashboard-view" class="view active">
-          <div class="stats-grid">
+          <div class="stats-grid stats-grid-5">
             <div class="stat-card">
               <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#icon-money"></use></svg></div>
               <div class="stat-content">
-                <h3>Recaudación Total</h3>
-                <p class="stat-value" id="stat-revenue">$0</p>
+                <h3>Recaudacion</h3>
+                <p class="stat-value" id="stat-revenue">Gs. 0</p>
               </div>
             </div>
             <div class="stat-card">
               <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#icon-ticket"></use></svg></div>
               <div class="stat-content">
-                <h3>Vouchers Vendidos</h3>
+                <h3>Vendidos</h3>
                 <p class="stat-value" id="stat-sold">0</p>
               </div>
             </div>
             <div class="stat-card">
               <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg></div>
               <div class="stat-content">
-                <h3>Vouchers Retirados</h3>
+                <h3>Retirados</h3>
                 <p class="stat-value" id="stat-redeemed">0</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#icon-warning"></use></svg></div>
+              <div class="stat-content">
+                <h3>Por Retirar</h3>
+                <p class="stat-value" id="stat-pending">0</p>
               </div>
             </div>
             <div class="stat-card">
               <div class="stat-icon"><svg class="icon" aria-hidden="true"><use href="#icon-chart"></use></svg></div>
               <div class="stat-content">
-                <h3>Tasa de Retiro</h3>
-                <p class="stat-value" id="stat-rate">0%</p>
+                <h3>Ganancia</h3>
+                <p class="stat-value" id="stat-profit">Gs. 0</p>
               </div>
             </div>
           </div>
@@ -249,10 +256,10 @@
               <input
                 type="number"
                 id="voucher-amount"
-                step="0.01"
+                step="1"
                 min="0"
                 required
-                inputmode="decimal"
+                inputmode="numeric"
               />
             </div>
             <button type="submit" class="btn btn-primary">
@@ -267,13 +274,21 @@
               Cliente: <span id="result-customer"></span>
             </p>
             <p class="amount-info">Monto: <span id="result-amount"></span></p>
-            <button id="view-card-btn" class="btn btn-primary">
-              Ver Tarjeta
-            </button>
-            <button id="download-qr" class="btn btn-secondary">
-              Descargar QR
-            </button>
-            <button id="new-voucher" class="btn btn-outline">Crear Otro</button>
+            <div class="post-sale-actions">
+              <button id="download-png-btn" class="btn btn-primary">
+                Descargar Imagen
+              </button>
+              <button id="download-pdf-btn" class="btn btn-secondary">
+                Descargar PDF
+              </button>
+              <button id="preview-voucher-btn" class="btn-icon" title="Vista previa">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.5rem;height:1.5rem;">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+            <button id="new-voucher" class="btn btn-outline" style="margin-top:var(--spacing-sm);width:100%;">Crear Otro</button>
           </div>
         </div>
 
@@ -285,7 +300,13 @@
 
           <div id="scanner-container" class="scanner-container">
             <div id="qr-reader"></div>
-            <p class="scanner-hint">Coloca el código QR frente a la cámara</p>
+            <p class="scanner-hint">Coloca el codigo QR frente a la camara</p>
+            <div class="scanner-alt-actions">
+              <button id="gallery-scan-btn" class="btn btn-outline" type="button">
+                Importar desde Galeria
+              </button>
+              <input type="file" id="gallery-file-input" accept="image/*" style="display:none;" />
+            </div>
           </div>
 
           <div id="scan-result" class="scan-result hidden">
@@ -342,9 +363,14 @@
                 class="voucher-badge"
               ></span>
             </div>
-            <button id="detail-template-btn" class="btn btn-secondary">
-              Modelo QR
-            </button>
+            <div class="detail-header-actions">
+              <button id="detail-finish-btn" class="btn btn-outline btn-sm hidden">
+                Finalizar
+              </button>
+              <button id="detail-template-btn" class="btn btn-secondary">
+                Modelo QR
+              </button>
+            </div>
           </div>
 
           <div id="detail-metrics" class="stats-grid"></div>
@@ -360,12 +386,34 @@
             <div id="add-product-form" class="add-product-form hidden">
               <div class="product-form-row">
                 <input type="text" id="new-product-name" placeholder="Nombre del producto" class="product-input" />
-                <input type="number" id="new-product-price" placeholder="Precio" step="0.01" min="0" class="product-input product-price-input" inputmode="decimal" />
+                <input type="number" id="new-product-price" placeholder="Precio" step="1" min="0" class="product-input product-price-input" inputmode="numeric" />
                 <button id="save-product-btn" class="btn btn-primary btn-sm">Guardar</button>
                 <button id="cancel-product-btn" class="btn btn-outline btn-sm">Cancelar</button>
               </div>
             </div>
             <div id="products-list" class="products-list"></div>
+          </div>
+
+          <!-- Cost Management Section -->
+          <div class="costs-section">
+            <div class="section-header">
+              <h3>Costos</h3>
+              <button id="add-cost-btn" class="btn btn-primary btn-sm hidden">
+                <svg class="icon" aria-hidden="true"><use href="#icon-plus"></use></svg> Agregar
+              </button>
+            </div>
+            <div id="add-cost-form" class="add-product-form hidden">
+              <div class="product-form-row">
+                <input type="text" id="new-cost-description" placeholder="Descripcion del costo" class="product-input" />
+                <input type="number" id="new-cost-amount" placeholder="Monto" step="1" min="0" class="product-input product-price-input" inputmode="numeric" />
+                <button id="save-cost-btn" class="btn btn-primary btn-sm">Guardar</button>
+                <button id="cancel-cost-btn" class="btn btn-outline btn-sm">Cancelar</button>
+              </div>
+            </div>
+            <div id="costs-list" class="products-list"></div>
+            <div class="costs-total">
+              <strong>Total Costos: </strong><span id="costs-total-amount">Gs. 0</span>
+            </div>
           </div>
 
           <div class="vouchers-table" style="margin-top: var(--spacing-lg)">
@@ -625,9 +673,32 @@
       </div>
     </div>
 
+    <!-- Voucher Edit Modal (superadmin) -->
+    <div id="voucher-edit-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Editar Voucher</h3>
+          <button class="modal-close" id="voucher-edit-modal-close">&times;</button>
+        </div>
+        <form id="voucher-edit-form">
+          <input type="hidden" id="edit-voucher-id" />
+          <div class="form-group">
+            <label for="edit-customer-name">Nombre del Cliente</label>
+            <input type="text" id="edit-customer-name" required minlength="2" maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label for="edit-voucher-amount">Monto (Gs.)</label>
+            <input type="number" id="edit-voucher-amount" step="1" min="0" required inputmode="numeric" />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Guardar</button>
+        </form>
+      </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay hidden">
       <div class="spinner"></div>
+      <p id="loading-text" class="loading-text"></p>
     </div>
 
     <!-- Toast Notifications -->
@@ -651,6 +722,6 @@
     <!-- Scripts (async so they don't block module loading) -->
     <script src="https://unpkg.com/html5-qrcode" async></script>
     <script src="https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js" async></script>
-    <script type="module" src="js/app.js?v=3"></script>
+    <script type="module" src="js/app.js?v=4"></script>
   </body>
 </html>

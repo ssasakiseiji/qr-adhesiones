@@ -64,23 +64,40 @@ const createVoucher = async (req, res) => {
 
 const getVouchers = async (req, res) => {
   try {
-    const { activityId, isRedeemed } = req.query;
+    const { activityId, isRedeemed, page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'DESC' } = req.query;
 
     const where = {};
     if (activityId) where.activityId = activityId;
     if (isRedeemed !== undefined) where.isRedeemed = isRedeemed === 'true';
 
-    const vouchers = await Voucher.findAll({
+    const allowedSortColumns = ['createdAt', 'customerName', 'amount', 'isRedeemed'];
+    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+    const safeSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+    const safeLimit = Math.min(Math.max(parseInt(limit) || 20, 1), 100);
+    const safePage = Math.max(parseInt(page) || 1, 1);
+    const offset = (safePage - 1) * safeLimit;
+
+    const { rows, count } = await Voucher.findAndCountAll({
       where,
       include: [{
         model: Activity,
         as: 'activity',
         attributes: ['id', 'name']
       }],
-      order: [['createdAt', 'DESC']]
+      order: [[safeSortBy, safeSortOrder]],
+      limit: safeLimit,
+      offset
     });
 
-    res.json(vouchers);
+    res.json({
+      vouchers: rows,
+      pagination: {
+        page: safePage,
+        limit: safeLimit,
+        total: count,
+        totalPages: Math.ceil(count / safeLimit)
+      }
+    });
   } catch (error) {
     console.error('Get vouchers error:', error);
     res.status(500).json({ error: 'Failed to fetch vouchers' });
@@ -178,10 +195,36 @@ const scanQRCode = async (req, res) => {
   }
 };
 
+const updateVoucher = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { customerName, amount } = req.body;
+
+    const voucher = await Voucher.findByPk(id);
+    if (!voucher) {
+      return res.status(404).json({ error: 'Voucher not found' });
+    }
+
+    await voucher.update({
+      customerName: customerName !== undefined ? customerName : voucher.customerName,
+      amount: amount !== undefined ? amount : voucher.amount
+    });
+
+    res.json({
+      message: 'Voucher updated successfully',
+      voucher
+    });
+  } catch (error) {
+    console.error('Update voucher error:', error);
+    res.status(500).json({ error: 'Failed to update voucher' });
+  }
+};
+
 module.exports = {
   createVoucher,
   getVouchers,
   getVoucherById,
   redeemVoucher,
-  scanQRCode
+  scanQRCode,
+  updateVoucher
 };

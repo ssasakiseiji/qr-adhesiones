@@ -5,7 +5,8 @@ const {
   getVouchers,
   getVoucherById,
   redeemVoucher,
-  scanQRCode
+  scanQRCode,
+  updateVoucher
 } = require('../controllers/voucherController');
 const { authenticateToken, requireRole } = require('../middleware/auth');
 const { voucherValidation, uuidValidation } = require('../middleware/validation');
@@ -17,6 +18,7 @@ router.get('/', getVouchers);
 router.post('/', requireRole('comision'), voucherValidation, createVoucher);
 router.get('/:id', uuidValidation, getVoucherById);
 router.put('/:id/redeem', uuidValidation, redeemVoucher);
+router.put('/:id', requireRole('superadmin'), uuidValidation, updateVoucher);
 router.get('/scan/:qrCode', scanQRCode);
 
 module.exports = router;

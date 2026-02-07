@@ -43,7 +43,7 @@ const createActivity = async (req, res) => {
 const updateActivity = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, isActive } = req.body;
+    const { name, description, isActive, finishedAt } = req.body;
 
     const activity = await Activity.findByPk(id);
 
@@ -51,11 +51,21 @@ const updateActivity = async (req, res) => {
       return res.status(404).json({ error: 'Activity not found' });
     }
 
-    await activity.update({
+    const updateData = {
       name: name !== undefined ? name : activity.name,
       description: description !== undefined ? description : activity.description,
       isActive: isActive !== undefined ? isActive : activity.isActive
-    });
+    };
+
+    // When finishing an activity, also deactivate it
+    if (finishedAt !== undefined) {
+      updateData.finishedAt = finishedAt;
+      if (finishedAt) {
+        updateData.isActive = false;
+      }
+    }
+
+    await activity.update(updateData);
 
     res.json({
       message: 'Activity updated successfully',

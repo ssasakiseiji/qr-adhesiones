@@ -1,6 +1,6 @@
-import api from './api.js?v=3';
-import activities from './activities.js?v=3';
-import qrTemplate from './qrTemplate.js?v=3';
+import api from './api.js?v=4';
+import activities from './activities.js?v=4';
+import qrTemplate from './qrTemplate.js?v=4';
 
 class Vouchers {
     constructor() {
@@ -22,9 +22,17 @@ class Vouchers {
             await this.createVoucher();
         });
 
-        // Download QR button
-        document.getElementById('download-qr').addEventListener('click', () => {
-            this.downloadQR();
+        // Post-sale buttons
+        document.getElementById('download-png-btn').addEventListener('click', () => {
+            qrTemplate.renderAndExportPng();
+        });
+
+        document.getElementById('download-pdf-btn').addEventListener('click', () => {
+            qrTemplate.renderAndExportPdf();
+        });
+
+        document.getElementById('preview-voucher-btn').addEventListener('click', () => {
+            qrTemplate.openCardModal();
         });
 
         // New voucher button
@@ -86,7 +94,7 @@ class Vouchers {
 
         pickerList.innerHTML = this.products.map(product => {
             const qty = this.cart[product.id] || 0;
-            const subtotal = qty * parseFloat(product.price);
+            const subtotal = qty * Number(product.price);
             return `
                 <div class="product-picker-item">
                     <div class="product-picker-info">
@@ -94,7 +102,7 @@ class Vouchers {
                         <span class="product-picker-price">Gs. ${Number(product.price).toLocaleString('es-PY')}</span>
                     </div>
                     <div class="product-picker-controls">
-                        <button type="button" class="qty-btn qty-minus" data-product-id="${product.id}" ${qty === 0 ? 'disabled' : ''}>−</button>
+                        <button type="button" class="qty-btn qty-minus" data-product-id="${product.id}" ${qty === 0 ? 'disabled' : ''}>-</button>
                         <span class="qty-value">${qty}</span>
                         <button type="button" class="qty-btn qty-plus" data-product-id="${product.id}">+</button>
                     </div>
@@ -141,11 +149,11 @@ class Vouchers {
         for (const [productId, qty] of Object.entries(this.cart)) {
             const product = this.products.find(p => p.id === productId);
             if (product) {
-                total += qty * parseFloat(product.price);
+                total += qty * Number(product.price);
             }
         }
 
-        document.getElementById('voucher-amount').value = total > 0 ? total.toFixed(2) : '';
+        document.getElementById('voucher-amount').value = total > 0 ? total : '';
     }
 
     toggleEditTotal() {
@@ -157,7 +165,7 @@ class Vouchers {
             amountInput.readOnly = false;
             amountInput.focus();
             toggleBtn.textContent = 'Auto';
-            toggleBtn.title = 'Volver al cálculo automático';
+            toggleBtn.title = 'Volver al calculo automatico';
         } else {
             amountInput.readOnly = true;
             toggleBtn.textContent = 'Editar';
@@ -177,9 +185,9 @@ class Vouchers {
             items.push({
                 productId: product.id,
                 productName: product.name,
-                unitPrice: parseFloat(product.price),
+                unitPrice: Number(product.price),
                 quantity: qty,
-                subtotal: qty * parseFloat(product.price)
+                subtotal: qty * Number(product.price)
             });
         }
         return items.length > 0 ? items : null;
@@ -194,7 +202,7 @@ class Vouchers {
         }
 
         const customerName = document.getElementById('customer-name').value;
-        const amount = parseFloat(document.getElementById('voucher-amount').value);
+        const amount = parseInt(document.getElementById('voucher-amount').value);
         const items = this.buildItems();
 
         if (isNaN(amount) || amount <= 0) {
@@ -236,15 +244,6 @@ class Vouchers {
         document.getElementById('result-amount').textContent = `Gs. ${Number(voucher.amount).toLocaleString('es-PY')}`;
     }
 
-    downloadQR() {
-        if (!this.currentVoucher) return;
-
-        const link = document.createElement('a');
-        link.href = this.currentVoucher.qrCodeImage;
-        link.download = `voucher-${this.currentVoucher.customerName.replace(/\s+/g, '-')}.png`;
-        link.click();
-    }
-
     resetForm() {
         document.getElementById('voucher-form').reset();
         document.getElementById('voucher-form').style.display = 'block';
@@ -260,27 +259,18 @@ class Vouchers {
         this.renderProductPicker();
     }
 
-    async loadVouchers(activityId = null, isRedeemed = null) {
-        try {
-            const vouchers = await api.getVouchers(activityId, isRedeemed);
-            return vouchers;
-        } catch (error) {
-            console.error('Error loading vouchers:', error);
-            this.showToast('Error al cargar vouchers', 'error');
-            return [];
-        }
-    }
-
-    renderVouchersList(vouchers, containerId) {
+    renderVouchersList(vouchersList, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        if (vouchers.length === 0) {
+        const list = Array.isArray(vouchersList) ? vouchersList : [];
+
+        if (list.length === 0) {
             container.innerHTML = '<p class="text-center text-muted">No hay vouchers</p>';
             return;
         }
 
-        container.innerHTML = vouchers.map(voucher => `
+        container.innerHTML = list.map(voucher => `
             <div class="voucher-item">
                 <div>
                     <h4>${voucher.customerName}</h4>

@@ -1,4 +1,4 @@
-import api from './api.js?v=3';
+import api from './api.js?v=4';
 
 class Activities {
     constructor() {
@@ -63,8 +63,10 @@ class Activities {
     renderActivitySelector() {
         const selector = document.getElementById('activity-selector');
         selector.innerHTML = '<option value="">Seleccionar actividad...</option>';
-        
-        this.activities.forEach(activity => {
+
+        // Exclude finished activities from the sales selector
+        const activeActivities = this.activities.filter(a => !a.finishedAt);
+        activeActivities.forEach(activity => {
             const option = document.createElement('option');
             option.value = activity.id;
             option.textContent = activity.name;
@@ -74,7 +76,7 @@ class Activities {
             selector.appendChild(option);
         });
 
-        // Also update filter selects
+        // Filter selects in metrics show ALL activities (including finished)
         const filterSelect = document.getElementById('filter-activity');
         if (filterSelect) {
             filterSelect.innerHTML = '<option value="">Todas las actividades</option>';
@@ -96,20 +98,33 @@ class Activities {
             return;
         }
 
-        container.innerHTML = this.activities.map(activity => `
-            <div class="voucher-item" style="cursor: pointer;" data-activity-id="${activity.id}">
-                <div>
-                    <h4>${activity.name}</h4>
-                    <p class="text-muted">${activity.description || 'Sin descripción'}</p>
-                    <small class="text-muted">Creada: ${new Date(activity.createdAt).toLocaleDateString()}</small>
+        container.innerHTML = this.activities.map(activity => {
+            let badgeClass, badgeText;
+            if (activity.finishedAt) {
+                badgeClass = 'finished';
+                badgeText = 'Finalizada';
+            } else if (activity.isActive) {
+                badgeClass = 'redeemed';
+                badgeText = 'Activa';
+            } else {
+                badgeClass = 'pending';
+                badgeText = 'Inactiva';
+            }
+            return `
+                <div class="voucher-item" style="cursor: pointer;" data-activity-id="${activity.id}">
+                    <div>
+                        <h4>${activity.name}</h4>
+                        <p class="text-muted">${activity.description || 'Sin descripción'}</p>
+                        <small class="text-muted">Creada: ${new Date(activity.createdAt).toLocaleDateString()}</small>
+                    </div>
+                    <div>
+                        <span class="voucher-badge ${badgeClass}">
+                            ${badgeText}
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <span class="voucher-badge ${activity.isActive ? 'redeemed' : 'pending'}">
-                        ${activity.isActive ? 'Activa' : 'Inactiva'}
-                    </span>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         // Add click handlers
         container.querySelectorAll('[data-activity-id]').forEach(item => {

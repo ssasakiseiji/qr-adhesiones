@@ -1,5 +1,5 @@
-import api from './api.js?v=3';
-import { icon } from './icons.js?v=3';
+import api from './api.js?v=4';
+import { icon } from './icons.js?v=4';
 
 class Users {
     constructor() {

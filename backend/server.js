@@ -13,6 +13,7 @@ const metricsRoutes = require('./routes/metrics');
 const logoRoutes = require('./routes/logos');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users');
+const costRoutes = require('./routes/costs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,6 +50,7 @@ app.use('/api/metrics', metricsRoutes);
 app.use('/api/logos', logoRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/costs', costRoutes);
 
 // 404 handler
 app.use((req, res) => {

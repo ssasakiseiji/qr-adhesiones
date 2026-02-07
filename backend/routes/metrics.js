@@ -4,11 +4,12 @@ const {
   getActivityMetrics,
   getSummaryMetrics
 } = require('../controllers/metricsController');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, requireRole } = require('../middleware/auth');
 const { uuidValidation } = require('../middleware/validation');
 
-// All routes require authentication
+// All routes require authentication + comision role minimum
 router.use(authenticateToken);
+router.use(requireRole('comision'));
 
 router.get('/summary', getSummaryMetrics);
 router.get('/activity/:id', uuidValidation, getActivityMetrics);

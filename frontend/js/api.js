@@ -133,10 +133,10 @@ class API {
     }
 
     // Voucher endpoints
-    async getVouchers(activityId = null, isRedeemed = null) {
-        let endpoint = '/vouchers?';
-        if (activityId) endpoint += `activityId=${activityId}&`;
-        if (isRedeemed !== null) endpoint += `isRedeemed=${isRedeemed}`;
+    async getVouchers(activityId = null, isRedeemed = null, page = 1, limit = 20, sortBy = 'createdAt', sortOrder = 'DESC') {
+        let endpoint = `/vouchers?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+        if (activityId) endpoint += `&activityId=${activityId}`;
+        if (isRedeemed !== null) endpoint += `&isRedeemed=${isRedeemed}`;
         return this.request(endpoint);
     }
 
@@ -203,6 +203,39 @@ class API {
     async deleteProduct(id) {
         return this.request(`/products/${id}`, {
             method: 'DELETE'
+        });
+    }
+
+    // Cost endpoints
+    async getCosts(activityId) {
+        return this.request(`/costs/activity/${activityId}`);
+    }
+
+    async createCost(activityId, description, amount) {
+        return this.request(`/costs/activity/${activityId}`, {
+            method: 'POST',
+            body: JSON.stringify({ description, amount })
+        });
+    }
+
+    async updateCost(id, data) {
+        return this.request(`/costs/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async deleteCost(id) {
+        return this.request(`/costs/${id}`, {
+            method: 'DELETE'
+        });
+    }
+
+    // Voucher update (superadmin)
+    async updateVoucher(id, data) {
+        return this.request(`/vouchers/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
         });
     }
 

@@ -87,6 +87,11 @@ const Activity = sequelize.define('Activity', {
     validate: {
       is: /^([01]\d|2[0-3]):[0-5]\d$/
     }
+  },
+  finishedAt: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+    defaultValue: null
   }
 }, {
   tableName: 'activities',

@@ -1,4 +1,4 @@
-const { Voucher, Activity } = require('../models');
+const { Voucher, Activity, Cost } = require('../models');
 const { Op } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -21,10 +21,20 @@ const getActivityMetrics = async (req, res) => {
       raw: true
     });
 
+    // Get total costs for this activity
+    const costResult = await Cost.findAll({
+      where: { activityId: id },
+      attributes: [
+        [sequelize.fn('SUM', sequelize.col('amount')), 'totalCosts'],
+      ],
+      raw: true
+    });
+
     const result = metrics[0];
     const totalVouchers = parseInt(result.totalVouchers) || 0;
-    const totalRevenue = parseFloat(result.totalRevenue) || 0;
+    const totalRevenue = parseInt(result.totalRevenue) || 0;
     const redeemedCount = parseInt(result.redeemedCount) || 0;
+    const totalCosts = parseInt(costResult[0].totalCosts) || 0;
     const redemptionRate = totalVouchers > 0 ? (redeemedCount / totalVouchers * 100).toFixed(2) : 0;
 
     res.json({
@@ -37,7 +47,9 @@ const getActivityMetrics = async (req, res) => {
         totalRevenue,
         redeemedCount,
         pendingCount: totalVouchers - redeemedCount,
-        redemptionRate: parseFloat(redemptionRate)
+        redemptionRate: parseFloat(redemptionRate),
+        totalCosts,
+        profit: totalRevenue - totalCosts
       }
     });
   } catch (error) {
@@ -65,16 +77,34 @@ const getSummaryMetrics = async (req, res) => {
       raw: true
     });
 
-    const summary = activities.map(activity => ({
-      activityId: activity.id,
-      activityName: activity.name,
-      totalVouchers: parseInt(activity.totalVouchers) || 0,
-      totalRevenue: parseFloat(activity.totalRevenue) || 0,
-      redeemedCount: parseInt(activity.redeemedCount) || 0,
-      redemptionRate: activity.totalVouchers > 0 
-        ? parseFloat((activity.redeemedCount / activity.totalVouchers * 100).toFixed(2))
-        : 0
-    }));
+    // Get costs per activity
+    const costsByActivity = await Cost.findAll({
+      attributes: [
+        'activityId',
+        [sequelize.fn('SUM', sequelize.col('amount')), 'totalCosts'],
+      ],
+      group: ['activityId'],
+      raw: true
+    });
+    const costsMap = {};
+    costsByActivity.forEach(c => { costsMap[c.activityId] = parseInt(c.totalCosts) || 0; });
+
+    const summary = activities.map(activity => {
+      const totalRevenue = parseInt(activity.totalRevenue) || 0;
+      const totalCosts = costsMap[activity.id] || 0;
+      return {
+        activityId: activity.id,
+        activityName: activity.name,
+        totalVouchers: parseInt(activity.totalVouchers) || 0,
+        totalRevenue,
+        redeemedCount: parseInt(activity.redeemedCount) || 0,
+        redemptionRate: activity.totalVouchers > 0
+          ? parseFloat((activity.redeemedCount / activity.totalVouchers * 100).toFixed(2))
+          : 0,
+        totalCosts,
+        profit: totalRevenue - totalCosts
+      };
+    });
 
     // Calculate overall totals
     const overallMetrics = await Voucher.findAll({
@@ -86,10 +116,18 @@ const getSummaryMetrics = async (req, res) => {
       raw: true
     });
 
+    const overallCosts = await Cost.findAll({
+      attributes: [
+        [sequelize.fn('SUM', sequelize.col('amount')), 'totalCosts'],
+      ],
+      raw: true
+    });
+
     const overall = overallMetrics[0];
     const totalVouchers = parseInt(overall.totalVouchers) || 0;
-    const totalRevenue = parseFloat(overall.totalRevenue) || 0;
+    const totalRevenue = parseInt(overall.totalRevenue) || 0;
     const redeemedCount = parseInt(overall.redeemedCount) || 0;
+    const totalCosts = parseInt(overallCosts[0].totalCosts) || 0;
 
     res.json({
       overall: {
@@ -97,9 +135,11 @@ const getSummaryMetrics = async (req, res) => {
         totalRevenue,
         redeemedCount,
         pendingCount: totalVouchers - redeemedCount,
-        redemptionRate: totalVouchers > 0 
+        redemptionRate: totalVouchers > 0
           ? parseFloat((redeemedCount / totalVouchers * 100).toFixed(2))
-          : 0
+          : 0,
+        totalCosts,
+        profit: totalRevenue - totalCosts
       },
       byActivity: summary
     });

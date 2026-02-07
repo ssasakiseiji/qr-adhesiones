@@ -1,6 +1,6 @@
-import api from './api.js?v=3';
-import activities from './activities.js?v=3';
-import logoManager from './logoManager.js?v=3';
+import api from './api.js?v=4';
+import activities from './activities.js?v=4';
+import logoManager from './logoManager.js?v=4';
 
 class QrTemplate {
     constructor() {
@@ -103,8 +103,6 @@ class QrTemplate {
         document.getElementById('export-png-btn').addEventListener('click', () => this.exportPng());
         document.getElementById('export-pdf-btn').addEventListener('click', () => this.exportPdf());
 
-        // "Ver Tarjeta" button
-        document.getElementById('view-card-btn').addEventListener('click', () => this.openVoucherCard());
     }
 
     async openTemplateConfig() {
@@ -251,6 +249,73 @@ class QrTemplate {
 
     setCurrentVoucher(voucher) {
         this.currentVoucher = voucher;
+    }
+
+    // Called by preview eye button in post-sale
+    async openCardModal() {
+        await this.openVoucherCard();
+    }
+
+    // Render card to hidden canvas and download as PNG directly
+    async renderAndExportPng() {
+        if (!this.currentVoucher) return;
+
+        const activity = activities.getCurrentActivity();
+        if (!activity) return;
+
+        const allActivities = await api.getActivities();
+        const fullActivity = allActivities.find(a => a.id === activity.id);
+        if (!fullActivity) return;
+
+        // Use the modal canvas (off-screen if modal is hidden)
+        const canvas = document.getElementById('voucher-card-canvas');
+        await this.renderCard(canvas, {
+            template: fullActivity,
+            voucher: this.currentVoucher,
+            qrCodeDataUrl: this.currentVoucher.qrCodeImage
+        });
+
+        this.exportPng();
+    }
+
+    // Render card to hidden canvas and download as PDF directly
+    async renderAndExportPdf() {
+        if (!this.currentVoucher) return;
+
+        const activity = activities.getCurrentActivity();
+        if (!activity) return;
+
+        const allActivities = await api.getActivities();
+        const fullActivity = allActivities.find(a => a.id === activity.id);
+        if (!fullActivity) return;
+
+        const canvas = document.getElementById('voucher-card-canvas');
+        await this.renderCard(canvas, {
+            template: fullActivity,
+            voucher: this.currentVoucher,
+            qrCodeDataUrl: this.currentVoucher.qrCodeImage
+        });
+
+        this.exportPdf();
+    }
+
+    // Load a voucher by ID and show in modal (used by metrics history)
+    async showVoucherCard(voucherId) {
+        const voucher = await api.getVoucher(voucherId);
+        this.currentVoucher = voucher;
+
+        // Get the voucher's activity template
+        const allActivities = await api.getActivities();
+        const fullActivity = allActivities.find(a => a.id === voucher.activityId);
+
+        const canvas = document.getElementById('voucher-card-canvas');
+        document.getElementById('voucher-card-modal').classList.remove('hidden');
+
+        await this.renderCard(canvas, {
+            template: fullActivity || {},
+            voucher: voucher,
+            qrCodeDataUrl: voucher.qrCodeImage
+        });
     }
 
     // ========================
