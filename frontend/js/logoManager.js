@@ -1,4 +1,4 @@
-import api from './api.js?v=2';
+import api from './api.js?v=3';
 
 class LogoManager {
     constructor() {

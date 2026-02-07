@@ -1,5 +1,5 @@
-import api from './api.js?v=2';
-import { icon } from './icons.js?v=2';
+import api from './api.js?v=3';
+import { icon } from './icons.js?v=3';
 
 class ActivityDetail {
     constructor() {

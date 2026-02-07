@@ -1,11 +1,11 @@
-import auth from './auth.js?v=2';
-import activities from './activities.js?v=2';
-import vouchers from './vouchers.js?v=2';
-import scanner from './scanner.js?v=2';
-import metrics from './metrics.js?v=2';
-import activityDetail from './activityDetail.js?v=2';
-import qrTemplate from './qrTemplate.js?v=2';
-import logoManager from './logoManager.js?v=2';
+import auth from './auth.js?v=3';
+import activities from './activities.js?v=3';
+import vouchers from './vouchers.js?v=3';
+import scanner from './scanner.js?v=3';
+import metrics from './metrics.js?v=3';
+import activityDetail from './activityDetail.js?v=3';
+import qrTemplate from './qrTemplate.js?v=3';
+import logoManager from './logoManager.js?v=3';
 
 class App {
     constructor() {
@@ -15,16 +15,17 @@ class App {
     }
 
     init() {
-        // Check authentication on load
-        auth.checkAuth();
-
-        // Initialize modules when app is ready
+        // IMPORTANT: Register event listeners BEFORE checkAuth(),
+        // because checkAuth() -> showApp() dispatches 'app-ready' synchronously
         window.addEventListener('app-ready', async () => {
             await this.onAppReady();
         });
 
         // Navigation
         this.initNavigation();
+
+        // Check authentication on load (may fire 'app-ready' synchronously)
+        auth.checkAuth();
     }
 
     async onAppReady() {

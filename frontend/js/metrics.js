@@ -1,7 +1,7 @@
-import api from './api.js?v=2';
-import activities from './activities.js?v=2';
-import vouchers from './vouchers.js?v=2';
-import { icon } from './icons.js?v=2';
+import api from './api.js?v=3';
+import activities from './activities.js?v=3';
+import vouchers from './vouchers.js?v=3';
+import { icon } from './icons.js?v=3';
 
 class Metrics {
     constructor() {
@@ -182,24 +182,22 @@ class Metrics {
     }
 
     async updateDashboard() {
-        const activity = activities.getCurrentActivity();
-        
-        if (!activity) {
-            // Show overall metrics
-            const metrics = await api.getSummaryMetrics();
-            this.updateDashboardStats(metrics.overall);
-            
-            // Load recent vouchers
-            const recentVouchers = await vouchers.loadVouchers(null, null);
-            vouchers.renderVouchersList(recentVouchers.slice(0, 5), 'recent-vouchers-list');
-        } else {
-            // Show activity-specific metrics
-            const metrics = await api.getActivityMetrics(activity.id);
-            this.updateDashboardStats(metrics.metrics);
-            
-            // Load recent vouchers for activity
-            const recentVouchers = await vouchers.loadVouchers(activity.id, null);
-            vouchers.renderVouchersList(recentVouchers.slice(0, 5), 'recent-vouchers-list');
+        try {
+            const activity = activities.getCurrentActivity();
+
+            if (!activity) {
+                const metrics = await api.getSummaryMetrics();
+                this.updateDashboardStats(metrics.overall);
+                const recentVouchers = await vouchers.loadVouchers(null, null);
+                vouchers.renderVouchersList(recentVouchers.slice(0, 5), 'recent-vouchers-list');
+            } else {
+                const metrics = await api.getActivityMetrics(activity.id);
+                this.updateDashboardStats(metrics.metrics);
+                const recentVouchers = await vouchers.loadVouchers(activity.id, null);
+                vouchers.renderVouchersList(recentVouchers.slice(0, 5), 'recent-vouchers-list');
+            }
+        } catch (error) {
+            console.error('Error updating dashboard:', error);
         }
     }
 
