@@ -118,12 +118,15 @@ class ActivityDetail {
             return;
         }
 
+        const isSuperadmin = document.body.dataset.role === 'superadmin';
+
         container.innerHTML = products.map(product => `
             <div class="product-item ${!product.isActive ? 'product-inactive' : ''}" data-id="${product.id}">
                 <div class="product-info">
                     <span class="product-name">${product.name}</span>
                     <span class="product-price">Gs. ${Number(product.price).toLocaleString('es-PY')}</span>
                 </div>
+                ${isSuperadmin ? `
                 <div class="product-actions">
                     <button class="btn-icon" onclick="window.activityDetail.toggleProduct('${product.id}', ${!product.isActive})" title="${product.isActive ? 'Desactivar' : 'Activar'}">
                         ${product.isActive ? icon('check') : icon('error')}
@@ -132,6 +135,7 @@ class ActivityDetail {
                         ${icon('error')}
                     </button>
                 </div>
+                ` : ''}
             </div>
         `).join('');
     }

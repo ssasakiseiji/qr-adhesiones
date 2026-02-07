@@ -8,7 +8,18 @@ const validate = (req, res, next) => {
   next();
 };
 
-const registerValidation = [
+const loginValidation = [
+  body('username')
+    .trim()
+    .notEmpty()
+    .withMessage('Username is required'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required'),
+  validate
+];
+
+const createUserValidation = [
   body('username')
     .trim()
     .isLength({ min: 3, max: 50 })
@@ -16,6 +27,7 @@ const registerValidation = [
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Username can only contain letters, numbers, and underscores'),
   body('email')
+    .optional({ values: 'null' })
     .trim()
     .isEmail()
     .normalizeEmail()
@@ -23,18 +35,35 @@ const registerValidation = [
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long'),
+  body('role')
+    .optional()
+    .isIn(['esbirro', 'comision', 'superadmin'])
+    .withMessage('Role must be esbirro, comision, or superadmin'),
   validate
 ];
 
-const loginValidation = [
+const updateUserValidation = [
+  body('username')
+    .optional()
+    .trim()
+    .isLength({ min: 3, max: 50 })
+    .withMessage('Username must be between 3 and 50 characters')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username can only contain letters, numbers, and underscores'),
   body('email')
+    .optional({ values: 'null' })
     .trim()
     .isEmail()
     .normalizeEmail()
     .withMessage('Must be a valid email address'),
   body('password')
-    .notEmpty()
-    .withMessage('Password is required'),
+    .optional()
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
+  body('role')
+    .optional()
+    .isIn(['esbirro', 'comision', 'superadmin'])
+    .withMessage('Role must be esbirro, comision, or superadmin'),
   validate
 ];
 
@@ -144,8 +173,9 @@ const templateValidation = [
 ];
 
 module.exports = {
-  registerValidation,
   loginValidation,
+  createUserValidation,
+  updateUserValidation,
   activityValidation,
   voucherValidation,
   uuidValidation,

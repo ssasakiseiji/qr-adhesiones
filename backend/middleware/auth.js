@@ -35,9 +35,19 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-const requireRole = (role) => {
+// Role hierarchy: superadmin > comision > esbirro
+const ROLE_HIERARCHY = {
+  esbirro: 1,
+  comision: 2,
+  superadmin: 3
+};
+
+const requireRole = (minimumRole) => {
   return (req, res, next) => {
-    if (req.user.role !== role) {
+    const userLevel = ROLE_HIERARCHY[req.user.role] || 0;
+    const requiredLevel = ROLE_HIERARCHY[minimumRole] || 0;
+
+    if (userLevel < requiredLevel) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
     next();

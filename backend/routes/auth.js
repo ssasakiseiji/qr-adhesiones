@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
-const { registerValidation, loginValidation } = require('../middleware/validation');
+const { login, me } = require('../controllers/authController');
+const { loginValidation } = require('../middleware/validation');
+const { authenticateToken } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
 
-// Apply rate limiter to all auth routes
-router.use(authLimiter);
+// Apply rate limiter to login
+router.post('/login', authLimiter, loginValidation, login);
 
-router.post('/register', registerValidation, register);
-router.post('/login', loginValidation, login);
+// Get current user info (authenticated)
+router.get('/me', authenticateToken, me);
 
 module.exports = router;

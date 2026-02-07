@@ -69,20 +69,41 @@ class API {
         }
     }
 
-    // Auth endpoints (bypass session expired check)
-    async register(username, email, password) {
-        this._sessionExpired = false;
-        return this.request('/auth/register', {
-            method: 'POST',
-            body: JSON.stringify({ username, email, password })
-        });
-    }
-
-    async login(email, password) {
+    // Auth endpoints
+    async login(username, password) {
         this._sessionExpired = false;
         return this.request('/auth/login', {
             method: 'POST',
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ username, password })
+        });
+    }
+
+    async getMe() {
+        return this.request('/auth/me');
+    }
+
+    // User management endpoints (superadmin only)
+    async getUsers() {
+        return this.request('/users');
+    }
+
+    async createUser(username, password, role, email = null) {
+        return this.request('/users', {
+            method: 'POST',
+            body: JSON.stringify({ username, password, role, email })
+        });
+    }
+
+    async updateUser(id, data) {
+        return this.request(`/users/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    async deleteUser(id) {
+        return this.request(`/users/${id}`, {
+            method: 'DELETE'
         });
     }
 

@@ -3,7 +3,13 @@ const { Op } = require('sequelize');
 
 const getAllActivities = async (req, res) => {
   try {
+    const where = {};
+    if (req.user.role === 'esbirro') {
+      where.isActive = true;
+    }
+
     const activities = await Activity.findAll({
+      where,
       include: [{ model: Logo, as: 'templateLogo', attributes: ['id', 'name', 'svgContent'] }],
       order: [['createdAt', 'DESC']]
     });

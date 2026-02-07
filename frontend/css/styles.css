@@ -368,6 +368,120 @@ body {
   min-width: 200px;
 }
 
+/* Profile Dropdown */
+.profile-dropdown {
+  position: relative;
+}
+
+.profile-btn {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.profile-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--primary);
+}
+
+.profile-btn .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + var(--spacing-xs));
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-xl);
+  min-width: 220px;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.profile-info {
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.profile-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.profile-role {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.profile-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0;
+}
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  min-height: 44px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  text-align: left;
+  font-family: inherit;
+}
+
+.profile-menu-item:hover {
+  background: var(--bg-glass);
+}
+
+.profile-menu-item .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--text-muted);
+}
+
+.profile-menu-item-danger {
+  color: var(--error);
+}
+
+.profile-menu-item-danger .icon {
+  color: var(--error);
+}
+
+/* Role badges */
+.voucher-badge.badge-superadmin {
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--primary-light);
+}
+
+/* Form hint */
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
 /* Main Content */
 .app-main {
   max-width: 1400px;
@@ -941,11 +1055,12 @@ body {
     font-size: max(16px, 0.875rem);
   }
 
-  #logout-btn {
-    font-size: 0.8rem;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    white-space: nowrap;
-    flex-shrink: 0;
+  .profile-menu {
+    min-width: 200px;
+  }
+
+  .bottom-nav .nav-item.hidden {
+    display: none;
   }
 
   /* Stats - 2 columns, compact cards */

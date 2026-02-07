@@ -18,8 +18,7 @@ const User = sequelize.define('User', {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
+    allowNull: true,
     validate: {
       isEmail: true
     }
@@ -29,8 +28,8 @@ const User = sequelize.define('User', {
     allowNull: false
   },
   role: {
-    type: DataTypes.ENUM('admin', 'user'),
-    defaultValue: 'user'
+    type: DataTypes.ENUM('esbirro', 'comision', 'superadmin'),
+    defaultValue: 'esbirro'
   }
 }, {
   tableName: 'users',

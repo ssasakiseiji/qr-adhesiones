@@ -6,6 +6,7 @@ import metrics from './metrics.js?v=3';
 import activityDetail from './activityDetail.js?v=3';
 import qrTemplate from './qrTemplate.js?v=3';
 import logoManager from './logoManager.js?v=3';
+import users from './users.js?v=3';
 
 class App {
     constructor() {
@@ -21,8 +22,14 @@ class App {
             await this.onAppReady();
         });
 
+        // Listen for role-ready to apply UI permissions
+        window.addEventListener('role-ready', (e) => {
+            this.applyRolePermissions(e.detail.role);
+        });
+
         // Navigation
         this.initNavigation();
+        this.initProfileDropdown();
 
         // Check authentication on load (may fire 'app-ready' synchronously)
         auth.checkAuth();
@@ -61,6 +68,7 @@ class App {
             qrTemplate.init();
             logoManager.init();
             activities.initEventListeners();
+            users.init();
 
             // Listen for activity changes
             window.addEventListener('activity-changed', () => {
@@ -126,6 +134,87 @@ class App {
         });
     }
 
+    initProfileDropdown() {
+        const profileBtn = document.getElementById('profile-btn');
+        const profileMenu = document.getElementById('profile-menu');
+
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu.classList.toggle('hidden');
+        });
+
+        // Close on click outside
+        document.addEventListener('click', () => {
+            profileMenu.classList.add('hidden');
+        });
+
+        // Prevent menu clicks from closing (except action buttons)
+        profileMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Settings button navigates to settings view
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            profileMenu.classList.add('hidden');
+            this.navigateToView('settings');
+        });
+    }
+
+    applyRolePermissions(role) {
+        // Navigation visibility
+        const salesNav = document.querySelector('.nav-item[data-view="sales"]');
+        const activitiesNav = document.querySelector('.nav-item[data-view="activities"]');
+
+        if (role === 'esbirro') {
+            salesNav.classList.add('hidden');
+            activitiesNav.classList.add('hidden');
+        } else {
+            salesNav.classList.remove('hidden');
+            activitiesNav.classList.remove('hidden');
+        }
+
+        // Quick action "Nueva Venta" in dashboard
+        const salesAction = document.querySelector('.action-btn[data-view="sales"]');
+        if (salesAction) {
+            salesAction.classList.toggle('hidden', role === 'esbirro');
+        }
+
+        // Settings button in profile dropdown (superadmin only)
+        const settingsBtn = document.getElementById('settings-btn');
+        if (settingsBtn) {
+            settingsBtn.classList.toggle('hidden', role !== 'superadmin');
+        }
+
+        // Activities view management buttons (superadmin only)
+        const newActivityBtn = document.getElementById('new-activity-btn');
+        if (newActivityBtn) {
+            newActivityBtn.classList.toggle('hidden', role !== 'superadmin');
+        }
+
+        // Product management in activity detail (superadmin only)
+        const addProductBtn = document.getElementById('add-product-btn');
+        if (addProductBtn) {
+            addProductBtn.classList.toggle('hidden', role !== 'superadmin');
+        }
+
+        // Template button in activity detail (superadmin only)
+        const templateBtn = document.getElementById('detail-template-btn');
+        if (templateBtn) {
+            templateBtn.classList.toggle('hidden', role !== 'superadmin');
+        }
+
+        // Store role on body for CSS-based hiding if needed
+        document.body.dataset.role = role || '';
+
+        // Update profile info in dropdown
+        const user = auth.getUser();
+        if (user) {
+            document.getElementById('profile-name').textContent = user.username;
+            const roleLabels = { esbirro: 'Esbirro', comision: 'Comision', superadmin: 'Superadmin' };
+            document.getElementById('profile-role').textContent = roleLabels[user.role] || user.role;
+        }
+    }
+
     async navigateToView(viewName) {
         // Update views
         document.querySelectorAll('.view').forEach(view => {
@@ -133,7 +222,7 @@ class App {
         });
         document.getElementById(`${viewName}-view`).classList.add('active');
 
-        // Update navigation - activity-detail keeps "activities" highlighted
+        // Update navigation - activity-detail and settings don't have nav items
         const navView = viewName === 'activity-detail' ? 'activities' : viewName;
         document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
             item.classList.toggle('active', item.dataset.view === navView);
@@ -158,6 +247,9 @@ class App {
                 break;
             case 'activities':
                 // Activities already loaded
+                break;
+            case 'settings':
+                await users.loadUsers();
                 break;
         }
     }

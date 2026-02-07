@@ -1,59 +1,12 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
-const register = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-
-    // Check if user already exists
-    const existingUser = await User.findOne({
-      where: {
-        [require('sequelize').Op.or]: [{ email }, { username }]
-      }
-    });
-
-    if (existingUser) {
-      return res.status(400).json({
-        error: 'User with this email or username already exists'
-      });
-    }
-
-    // Create new user
-    const user = await User.create({
-      username,
-      email,
-      password
-    });
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role
-      }
-    });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed' });
-  }
-};
-
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ where: { email } });
+    // Find user by username
+    const user = await User.findOne({ where: { username } });
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -79,7 +32,6 @@ const login = async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email,
         role: user.role
       }
     });
@@ -89,4 +41,19 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const me = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.userId, {
+      attributes: ['id', 'username', 'role']
+    });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ user });
+  } catch (error) {
+    console.error('Me error:', error);
+    res.status(500).json({ error: 'Failed to fetch user info' });
+  }
+};
+
+module.exports = { login, me };
