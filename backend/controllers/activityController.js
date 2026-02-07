@@ -92,7 +92,7 @@ const deleteActivity = async (req, res) => {
 const updateTemplate = async (req, res) => {
   try {
     const { id } = req.params;
-    const { templateTitle, templateProductName, templateBgColor, templateTextColor, templateLogoId } = req.body;
+    const { templateTitle, templateProductName, templateBgColor, templateBgColor2, templateTextColor, templateLogoSize, templateLogoId, pickupDate, pickupStartTime, pickupEndTime } = req.body;
 
     const activity = await Activity.findByPk(id);
     if (!activity) {
@@ -110,8 +110,13 @@ const updateTemplate = async (req, res) => {
       templateTitle: templateTitle !== undefined ? templateTitle : activity.templateTitle,
       templateProductName: templateProductName !== undefined ? templateProductName : activity.templateProductName,
       templateBgColor: templateBgColor !== undefined ? templateBgColor : activity.templateBgColor,
+      templateBgColor2: templateBgColor2 !== undefined ? templateBgColor2 : activity.templateBgColor2,
       templateTextColor: templateTextColor !== undefined ? templateTextColor : activity.templateTextColor,
+      templateLogoSize: templateLogoSize !== undefined ? templateLogoSize : activity.templateLogoSize,
       templateLogoId: templateLogoId !== undefined ? templateLogoId : activity.templateLogoId,
+      pickupDate: pickupDate !== undefined ? pickupDate : activity.pickupDate,
+      pickupStartTime: pickupStartTime !== undefined ? pickupStartTime : activity.pickupStartTime,
+      pickupEndTime: pickupEndTime !== undefined ? pickupEndTime : activity.pickupEndTime,
     });
 
     const updated = await Activity.findByPk(id, {

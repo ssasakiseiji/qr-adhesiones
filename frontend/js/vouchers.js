@@ -91,7 +91,7 @@ class Vouchers {
                 <div class="product-picker-item">
                     <div class="product-picker-info">
                         <span class="product-picker-name">${product.name}</span>
-                        <span class="product-picker-price">$${parseFloat(product.price).toFixed(2)}</span>
+                        <span class="product-picker-price">Gs. ${Number(product.price).toLocaleString('es-PY')}</span>
                     </div>
                     <div class="product-picker-controls">
                         <button type="button" class="qty-btn qty-minus" data-product-id="${product.id}" ${qty === 0 ? 'disabled' : ''}>−</button>
@@ -99,7 +99,7 @@ class Vouchers {
                         <button type="button" class="qty-btn qty-plus" data-product-id="${product.id}">+</button>
                     </div>
                     <div class="product-picker-subtotal">
-                        ${qty > 0 ? `$${subtotal.toFixed(2)}` : ''}
+                        ${qty > 0 ? `Gs. ${Number(subtotal).toLocaleString('es-PY')}` : ''}
                     </div>
                 </div>
             `;
@@ -196,8 +196,6 @@ class Vouchers {
         const customerName = document.getElementById('customer-name').value;
         const amount = parseFloat(document.getElementById('voucher-amount').value);
         const items = this.buildItems();
-        const pickupDate = document.getElementById('voucher-pickup-date').value || null;
-        const pickupTime = document.getElementById('voucher-pickup-time').value || null;
 
         if (isNaN(amount) || amount <= 0) {
             this.showToast('El monto debe ser mayor a 0', 'error');
@@ -206,7 +204,7 @@ class Vouchers {
 
         try {
             this.showLoading(true);
-            const response = await api.createVoucher(activity.id, customerName, amount, items, pickupDate, pickupTime);
+            const response = await api.createVoucher(activity.id, customerName, amount, items);
 
             this.currentVoucher = response.voucher;
             qrTemplate.setCurrentVoucher(response.voucher);
@@ -235,7 +233,7 @@ class Vouchers {
 
         // Display customer info
         document.getElementById('result-customer').textContent = voucher.customerName;
-        document.getElementById('result-amount').textContent = `$${voucher.amount}`;
+        document.getElementById('result-amount').textContent = `Gs. ${Number(voucher.amount).toLocaleString('es-PY')}`;
     }
 
     downloadQR() {
@@ -286,7 +284,7 @@ class Vouchers {
             <div class="voucher-item">
                 <div>
                     <h4>${voucher.customerName}</h4>
-                    <p class="text-muted">Monto: $${voucher.amount}</p>
+                    <p class="text-muted">Monto: Gs. ${Number(voucher.amount).toLocaleString('es-PY')}</p>
                     <small class="text-muted">${new Date(voucher.createdAt).toLocaleString()}</small>
                 </div>
                 <div>

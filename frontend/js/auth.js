@@ -100,22 +100,25 @@ class Auth {
     logout() {
         api.clearToken();
         this.currentUser = null;
+        window.dispatchEvent(new Event('session-reset'));
         this.showAuth();
         this.showToast('Sesión cerrada', 'info');
     }
 
     onSessionExpired() {
-        if (!api.token) return; // Already handled
-        api.clearToken();
         this.currentUser = null;
+        window.dispatchEvent(new Event('session-reset'));
         this.showAuth();
         this.showToast('Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.', 'warning');
     }
 
     showAuth() {
+        this.hideSplash();
+        // Allow new API requests (login/register) after session expiry
+        api._sessionExpired = false;
         document.getElementById('auth-screen').classList.add('active');
         document.getElementById('app-screen').classList.remove('active');
-        
+
         // Clear forms
         document.getElementById('login-form').reset();
         document.getElementById('register-form').reset();
@@ -133,14 +136,22 @@ class Auth {
         const token = localStorage.getItem('token');
         if (token && !this.isTokenExpired(token)) {
             api.setToken(token);
+            // Splash is already visible from page load - showApp() will trigger data load
             this.showApp();
         } else {
             if (token) {
                 api.clearToken();
                 this.showToast('Tu sesión ha expirado. Por favor, iniciá sesión nuevamente.', 'warning');
             }
+            // Hide splash and show login
+            this.hideSplash();
             this.showAuth();
         }
+    }
+
+    hideSplash() {
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.classList.add('hidden');
     }
 
     isTokenExpired(token) {

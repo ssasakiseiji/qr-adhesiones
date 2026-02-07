@@ -52,17 +52,6 @@ const Voucher = sequelize.define('Voucher', {
     set(value) {
       this.setDataValue('items', value ? JSON.stringify(value) : null);
     }
-  },
-  pickupDate: {
-    type: DataTypes.DATEONLY,
-    allowNull: true
-  },
-  pickupTime: {
-    type: DataTypes.STRING(10),
-    allowNull: true,
-    validate: {
-      is: /^([01]\d|2[0-3]):[0-5]\d$/
-    }
   }
 }, {
   tableName: 'vouchers',

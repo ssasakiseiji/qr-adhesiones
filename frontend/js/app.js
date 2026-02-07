@@ -28,11 +28,15 @@ class App {
     }
 
     async onAppReady() {
-        if (!this.initialized) {
-            await this.initializeApp();
-        } else {
-            // Re-authentication: just reload data
-            await this.reloadData();
+        this.showSplash(true);
+        try {
+            if (!this.initialized) {
+                await this.initializeApp();
+            } else {
+                await this.reloadData();
+            }
+        } finally {
+            this.showSplash(false);
         }
     }
 
@@ -82,10 +86,19 @@ class App {
 
     async reloadData() {
         try {
+            // Reload activities (state was reset by session-reset event)
             await activities.loadActivities();
-            this.navigateToView('dashboard');
+            // Navigate to dashboard (which also loads dashboard data)
+            await this.navigateToView('dashboard');
         } catch (error) {
             console.error('Error reloading data:', error);
+        }
+    }
+
+    showSplash(show) {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.classList.toggle('hidden', !show);
         }
     }
 

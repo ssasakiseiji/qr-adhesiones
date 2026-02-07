@@ -18,7 +18,7 @@ const generateQRCode = async (data) => {
 
 const createVoucher = async (req, res) => {
   try {
-    const { activityId, customerName, amount, items, pickupDate, pickupTime } = req.body;
+    const { activityId, customerName, amount, items } = req.body;
 
     // Verify activity exists
     const activity = await Activity.findByPk(activityId);
@@ -39,8 +39,6 @@ const createVoucher = async (req, res) => {
       customerName,
       amount,
       items: items || null,
-      pickupDate: pickupDate || null,
-      pickupTime: pickupTime || null,
       qrCode: qrData
     });
 
@@ -52,8 +50,6 @@ const createVoucher = async (req, res) => {
         customerName: voucher.customerName,
         amount: voucher.amount,
         items: voucher.items,
-        pickupDate: voucher.pickupDate,
-        pickupTime: voucher.pickupTime,
         qrCode: qrData,
         qrCodeImage,
         isRedeemed: voucher.isRedeemed,

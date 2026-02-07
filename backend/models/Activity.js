@@ -38,6 +38,14 @@ const Activity = sequelize.define('Activity', {
       is: /^#[0-9A-Fa-f]{6}$/
     }
   },
+  templateBgColor2: {
+    type: DataTypes.STRING(7),
+    allowNull: true,
+    defaultValue: null,
+    validate: {
+      is: /^#[0-9A-Fa-f]{6}$/
+    }
+  },
   templateTextColor: {
     type: DataTypes.STRING(7),
     allowNull: true,
@@ -46,12 +54,38 @@ const Activity = sequelize.define('Activity', {
       isIn: [['#ffffff', '#000000']]
     }
   },
+  templateLogoSize: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 180,
+    validate: {
+      isIn: [[100, 140, 180, 220, 260]]
+    }
+  },
   templateLogoId: {
     type: DataTypes.UUID,
     allowNull: true,
     references: {
       model: 'logos',
       key: 'id'
+    }
+  },
+  pickupDate: {
+    type: DataTypes.DATEONLY,
+    allowNull: true
+  },
+  pickupStartTime: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+    validate: {
+      is: /^([01]\d|2[0-3]):[0-5]\d$/
+    }
+  },
+  pickupEndTime: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+    validate: {
+      is: /^([01]\d|2[0-3]):[0-5]\d$/
     }
   }
 }, {

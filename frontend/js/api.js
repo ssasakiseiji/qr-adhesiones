@@ -5,10 +5,12 @@ class API {
     constructor() {
         this.baseURL = API_BASE_URL;
         this.token = localStorage.getItem('token');
+        this._sessionExpired = false;
     }
 
     setToken(token) {
         this.token = token;
+        this._sessionExpired = false;
         localStorage.setItem('token', token);
     }
 
@@ -30,6 +32,11 @@ class API {
     }
 
     async request(endpoint, options = {}) {
+        // If session already expired, reject immediately to prevent cascading calls
+        if (this._sessionExpired) {
+            throw new Error('Session expired');
+        }
+
         const url = `${this.baseURL}${endpoint}`;
         const config = {
             ...options,
@@ -42,8 +49,12 @@ class API {
 
             if (!response.ok) {
                 if (response.status === 401 || (response.status === 403 && (data.error === 'Token expired' || data.error === 'Invalid token'))) {
-                    this.clearToken();
-                    window.dispatchEvent(new Event('session-expired'));
+                    // Only fire session-expired once to prevent cascading events
+                    if (!this._sessionExpired) {
+                        this._sessionExpired = true;
+                        this.clearToken();
+                        window.dispatchEvent(new Event('session-expired'));
+                    }
                     throw new Error('Session expired');
                 }
                 throw new Error(data.error || 'Request failed');
@@ -51,7 +62,9 @@ class API {
 
             return data;
         } catch (error) {
-            console.error('API Error:', error);
+            if (error.message !== 'Session expired') {
+                console.error('API Error:', error);
+            }
             throw error;
         }
     }
@@ -104,11 +117,9 @@ class API {
         return this.request(endpoint);
     }
 
-    async createVoucher(activityId, customerName, amount, items = null, pickupDate = null, pickupTime = null) {
+    async createVoucher(activityId, customerName, amount, items = null) {
         const body = { activityId, customerName, amount };
         if (items) body.items = items;
-        if (pickupDate) body.pickupDate = pickupDate;
-        if (pickupTime) body.pickupTime = pickupTime;
         return this.request('/vouchers', {
             method: 'POST',
             body: JSON.stringify(body)

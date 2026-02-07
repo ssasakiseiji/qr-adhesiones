@@ -17,6 +17,23 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
+    <!-- Splash / Loading Screen -->
+    <div id="splash-screen" class="splash-screen">
+      <div class="splash-content">
+        <div class="splash-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+            <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+          </svg>
+        </div>
+        <h2 class="splash-title">Vouchers QR</h2>
+        <div class="splash-loader">
+          <div class="splash-loader-bar"></div>
+        </div>
+        <p class="splash-text">Cargando datos...</p>
+      </div>
+    </div>
+
     <!-- SVG Icon Sprite -->
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
       <symbol id="icon-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -65,7 +82,7 @@
     </svg>
 
     <!-- Login Screen -->
-    <div id="auth-screen" class="screen active">
+    <div id="auth-screen" class="screen">
       <div class="auth-container">
         <div class="auth-card">
           <div class="auth-header">
@@ -213,7 +230,7 @@
             <!-- Amount section -->
             <div class="form-group" id="amount-group">
               <div class="amount-header">
-                <label for="voucher-amount">Total ($)</label>
+                <label for="voucher-amount">Total (Gs.)</label>
                 <button type="button" id="toggle-edit-total" class="btn-link hidden" title="Editar total manualmente">Editar</button>
               </div>
               <input
@@ -224,14 +241,6 @@
                 required
                 inputmode="decimal"
               />
-            </div>
-            <div class="form-group">
-              <label for="voucher-pickup-date">Fecha de Retiro (opcional)</label>
-              <input type="date" id="voucher-pickup-date" />
-            </div>
-            <div class="form-group">
-              <label for="voucher-pickup-time">Hora de Retiro (opcional)</label>
-              <input type="time" id="voucher-pickup-time" />
             </div>
             <button type="submit" class="btn btn-primary">
               Generar Voucher
@@ -444,6 +453,14 @@
             </div>
           </div>
           <div class="form-group">
+            <label for="template-bg-color2">Color Gradiente (opcional)</label>
+            <div class="color-picker-row">
+              <input type="color" id="template-bg-color2" value="#1e293b" class="color-picker-swatch" />
+              <input type="text" id="template-bg-color2-text" value="" maxlength="7" class="color-picker-text" placeholder="Sin gradiente" />
+              <button type="button" id="clear-gradient-btn" class="btn btn-outline" style="font-size:0.8rem;padding:0.25rem 0.5rem;">Quitar</button>
+            </div>
+          </div>
+          <div class="form-group">
             <label>Color del Texto</label>
             <div class="text-color-toggle">
               <button type="button" class="text-color-btn active" data-color="#ffffff"
@@ -463,6 +480,28 @@
             <button type="button" id="manage-logos-btn" class="btn btn-outline mt-1" style="font-size:0.85rem;">
               Gestionar Logos
             </button>
+          </div>
+          <div class="form-group">
+            <label for="template-logo-size">Tamaño del Logo</label>
+            <select id="template-logo-size" style="width:100%;padding:var(--spacing-sm);background:var(--bg-glass);border:1px solid var(--border-color);border-radius:var(--border-radius);color:var(--text-primary);font-size:max(16px,0.85rem);">
+              <option value="100">Chico (100px)</option>
+              <option value="140">Mediano (140px)</option>
+              <option value="180" selected>Grande (180px)</option>
+              <option value="220">Muy Grande (220px)</option>
+              <option value="260">Extra Grande (260px)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="template-pickup-date">Fecha de Retiro</label>
+            <input type="date" id="template-pickup-date" />
+          </div>
+          <div class="form-group">
+            <label>Horario de Retiro</label>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <input type="time" id="template-pickup-start" style="flex:1;" />
+              <span style="color:var(--text-secondary);">a</span>
+              <input type="time" id="template-pickup-end" style="flex:1;" />
+            </div>
           </div>
           <div class="form-group">
             <label>Vista Previa</label>

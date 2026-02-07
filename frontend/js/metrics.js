@@ -12,6 +12,10 @@ class Metrics {
         this.initEventListeners();
     }
 
+    reset() {
+        this.currentMetrics = null;
+    }
+
     initEventListeners() {
         // Filter changes
         document.getElementById('filter-activity').addEventListener('change', () => {
@@ -34,6 +38,11 @@ class Metrics {
 
         window.addEventListener('voucher-redeemed', () => {
             this.loadMetrics();
+        });
+
+        // Reset state on session end
+        window.addEventListener('session-reset', () => {
+            this.reset();
         });
     }
 

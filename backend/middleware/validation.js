@@ -64,14 +64,6 @@ const voucherValidation = [
     .optional({ values: 'null' })
     .isArray()
     .withMessage('Items must be an array'),
-  body('pickupDate')
-    .optional({ values: 'null' })
-    .isDate()
-    .withMessage('Pickup date must be a valid date (YYYY-MM-DD)'),
-  body('pickupTime')
-    .optional({ values: 'null' })
-    .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
-    .withMessage('Pickup time must be in HH:mm format'),
   validate
 ];
 
@@ -119,14 +111,35 @@ const templateValidation = [
     .optional()
     .matches(/^#[0-9A-Fa-f]{6}$/)
     .withMessage('Background color must be a valid hex color'),
+  body('templateBgColor2')
+    .optional({ values: 'null' })
+    .matches(/^#[0-9A-Fa-f]{6}$/)
+    .withMessage('Gradient color must be a valid hex color'),
   body('templateTextColor')
     .optional()
     .isIn(['#ffffff', '#000000'])
     .withMessage('Text color must be #ffffff or #000000'),
+  body('templateLogoSize')
+    .optional()
+    .isInt()
+    .isIn([100, 140, 180, 220, 260])
+    .withMessage('Logo size must be 100, 140, 180, 220, or 260'),
   body('templateLogoId')
     .optional({ values: 'null' })
     .isUUID()
     .withMessage('Logo ID must be a valid UUID'),
+  body('pickupDate')
+    .optional({ values: 'null' })
+    .isDate()
+    .withMessage('Pickup date must be a valid date (YYYY-MM-DD)'),
+  body('pickupStartTime')
+    .optional({ values: 'null' })
+    .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .withMessage('Start time must be in HH:mm format'),
+  body('pickupEndTime')
+    .optional({ values: 'null' })
+    .matches(/^([01]\d|2[0-3]):[0-5]\d$/)
+    .withMessage('End time must be in HH:mm format'),
   validate
 ];
 

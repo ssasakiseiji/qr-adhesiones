@@ -11,6 +11,11 @@ class Activities {
         this.initEventListeners();
     }
 
+    reset() {
+        this.activities = [];
+        this.currentActivity = null;
+    }
+
     initEventListeners() {
         // Activity selector in header
         document.getElementById('activity-selector').addEventListener('change', (e) => {
@@ -31,6 +36,11 @@ class Activities {
         // Modal close (scoped to activity modal)
         document.querySelector('#activity-modal .modal-close').addEventListener('click', () => {
             this.hideActivityModal();
+        });
+
+        // Reset state on session end
+        window.addEventListener('session-reset', () => {
+            this.reset();
         });
     }
 

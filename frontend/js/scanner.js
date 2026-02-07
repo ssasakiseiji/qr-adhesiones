@@ -73,7 +73,7 @@ class Scanner {
     renderItemsHtml(items) {
         if (!items || items.length === 0) return '';
         const lines = items.map(i =>
-            `<span>${i.quantity}x ${i.productName} — $${i.subtotal.toFixed(2)}</span>`
+            `<span>${i.quantity}x ${i.productName} — Gs. ${Number(i.subtotal).toLocaleString('es-PY')}</span>`
         ).join('');
         return `<div class="scan-items"><strong>Productos:</strong><div class="scan-items-list">${lines}</div></div>`;
     }
@@ -97,7 +97,7 @@ class Scanner {
 
             detailsEl.innerHTML = `
                 <p><strong>Cliente:</strong> ${voucher.customerName}</p>
-                <p><strong>Monto:</strong> $${voucher.amount}</p>
+                <p><strong>Monto:</strong> Gs. ${Number(voucher.amount).toLocaleString('es-PY')}</p>
                 ${itemsHtml}
                 <p><strong>Retirado el:</strong> ${new Date(voucher.redeemedAt).toLocaleString()}</p>
             `;
@@ -113,7 +113,7 @@ class Scanner {
 
             detailsEl.innerHTML = `
                 <p><strong>Cliente:</strong> ${voucher.customerName}</p>
-                <p><strong>Monto:</strong> $${voucher.amount}</p>
+                <p><strong>Monto:</strong> Gs. ${Number(voucher.amount).toLocaleString('es-PY')}</p>
                 ${itemsHtml}
                 <p><strong>Actividad:</strong> ${voucher.activity.name}</p>
                 <p><strong>Creado:</strong> ${new Date(voucher.createdAt).toLocaleString()}</p>

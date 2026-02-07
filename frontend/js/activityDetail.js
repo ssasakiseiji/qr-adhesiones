@@ -83,7 +83,7 @@ class ActivityDetail {
                 <div class="stat-icon">${icon('money')}</div>
                 <div class="stat-content">
                     <h3>Recaudación</h3>
-                    <p class="stat-value">$${metrics.totalRevenue.toFixed(2)}</p>
+                    <p class="stat-value">Gs. ${Number(metrics.totalRevenue).toLocaleString('es-PY')}</p>
                 </div>
             </div>
             <div class="stat-card">
@@ -122,7 +122,7 @@ class ActivityDetail {
             <div class="product-item ${!product.isActive ? 'product-inactive' : ''}" data-id="${product.id}">
                 <div class="product-info">
                     <span class="product-name">${product.name}</span>
-                    <span class="product-price">$${parseFloat(product.price).toFixed(2)}</span>
+                    <span class="product-price">Gs. ${Number(product.price).toLocaleString('es-PY')}</span>
                 </div>
                 <div class="product-actions">
                     <button class="btn-icon" onclick="window.activityDetail.toggleProduct('${product.id}', ${!product.isActive})" title="${product.isActive ? 'Desactivar' : 'Activar'}">
@@ -228,7 +228,7 @@ class ActivityDetail {
                 <div class="voucher-item">
                     <div>
                         <h4>${voucher.customerName}</h4>
-                        <p class="text-muted">Monto: $${voucher.amount}</p>
+                        <p class="text-muted">Monto: Gs. ${Number(voucher.amount).toLocaleString('es-PY')}</p>
                         ${itemsSummary ? `<p class="text-muted text-small">${itemsSummary}</p>` : ''}
                         <small class="text-muted">${new Date(voucher.createdAt).toLocaleString()}</small>
                     </div>

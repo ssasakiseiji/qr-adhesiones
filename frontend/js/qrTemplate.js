@@ -39,9 +39,38 @@ class QrTemplate {
             }
         });
 
+        // Gradient color picker sync
+        const colorPicker2 = document.getElementById('template-bg-color2');
+        const colorText2 = document.getElementById('template-bg-color2-text');
+
+        colorPicker2.addEventListener('input', (e) => {
+            colorText2.value = e.target.value;
+            this.updatePreview();
+        });
+
+        colorText2.addEventListener('change', (e) => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                colorPicker2.value = e.target.value;
+                this.updatePreview();
+            } else if (e.target.value === '') {
+                this.updatePreview();
+            }
+        });
+
+        document.getElementById('clear-gradient-btn').addEventListener('click', () => {
+            colorText2.value = '';
+            this.updatePreview();
+        });
+
+        // Logo size
+        document.getElementById('template-logo-size').addEventListener('change', () => this.updatePreview());
+
         // Live preview on input changes
         document.getElementById('template-title').addEventListener('input', () => this.updatePreview());
         document.getElementById('template-product').addEventListener('input', () => this.updatePreview());
+        document.getElementById('template-pickup-date').addEventListener('change', () => this.updatePreview());
+        document.getElementById('template-pickup-start').addEventListener('change', () => this.updatePreview());
+        document.getElementById('template-pickup-end').addEventListener('change', () => this.updatePreview());
 
         // Text color toggle
         document.querySelectorAll('.text-color-btn').forEach(btn => {
@@ -95,6 +124,14 @@ class QrTemplate {
         document.getElementById('template-bg-color').value = bgColor;
         document.getElementById('template-bg-color-text').value = bgColor;
 
+        // Populate gradient color
+        const bgColor2 = this.currentActivity.templateBgColor2 || '';
+        document.getElementById('template-bg-color2-text').value = bgColor2;
+        if (bgColor2) document.getElementById('template-bg-color2').value = bgColor2;
+
+        // Populate logo size
+        document.getElementById('template-logo-size').value = this.currentActivity.templateLogoSize || 180;
+
         // Populate text color toggle
         const textColor = this.currentActivity.templateTextColor || '#ffffff';
         document.getElementById('template-text-color').value = textColor;
@@ -103,6 +140,11 @@ class QrTemplate {
             btn.classList.toggle('active', isActive);
             btn.style.borderColor = isActive ? 'var(--primary)' : 'transparent';
         });
+
+        // Populate pickup fields
+        document.getElementById('template-pickup-date').value = this.currentActivity.pickupDate || '';
+        document.getElementById('template-pickup-start').value = this.currentActivity.pickupStartTime || '';
+        document.getElementById('template-pickup-end').value = this.currentActivity.pickupEndTime || '';
 
         // Load logos and select the current one
         await logoManager.loadLogos();
@@ -118,12 +160,18 @@ class QrTemplate {
     async saveTemplate() {
         if (!this.currentActivity) return;
 
+        const bgColor2Text = document.getElementById('template-bg-color2-text').value;
         const data = {
             templateTitle: document.getElementById('template-title').value.trim(),
             templateProductName: document.getElementById('template-product').value.trim(),
             templateBgColor: document.getElementById('template-bg-color').value,
+            templateBgColor2: bgColor2Text && /^#[0-9A-Fa-f]{6}$/.test(bgColor2Text) ? bgColor2Text : null,
             templateTextColor: document.getElementById('template-text-color').value,
-            templateLogoId: logoManager.selectedLogoId || null
+            templateLogoSize: parseInt(document.getElementById('template-logo-size').value) || 180,
+            templateLogoId: logoManager.selectedLogoId || null,
+            pickupDate: document.getElementById('template-pickup-date').value || null,
+            pickupStartTime: document.getElementById('template-pickup-start').value || null,
+            pickupEndTime: document.getElementById('template-pickup-end').value || null
         };
 
         try {
@@ -148,20 +196,24 @@ class QrTemplate {
         const canvas = document.getElementById('template-preview-canvas');
         if (!canvas) return;
 
+        const bgColor2Val = document.getElementById('template-bg-color2-text').value;
         const template = {
             templateTitle: document.getElementById('template-title').value || 'Titulo del Evento',
             templateProductName: document.getElementById('template-product').value || 'Producto',
             templateBgColor: document.getElementById('template-bg-color').value || '#1e293b',
+            templateBgColor2: bgColor2Val && /^#[0-9A-Fa-f]{6}$/.test(bgColor2Val) ? bgColor2Val : null,
             templateTextColor: document.getElementById('template-text-color').value || '#ffffff',
-            templateLogo: logoManager.getSelectedLogo()
+            templateLogoSize: parseInt(document.getElementById('template-logo-size').value) || 180,
+            templateLogo: logoManager.getSelectedLogo(),
+            pickupDate: document.getElementById('template-pickup-date').value || '',
+            pickupStartTime: document.getElementById('template-pickup-start').value || '',
+            pickupEndTime: document.getElementById('template-pickup-end').value || ''
         };
 
         const sampleVoucher = {
             customerName: 'Juan Perez',
             amount: '500',
             items: null,
-            pickupDate: '2026-03-15',
-            pickupTime: '12:00',
             createdAt: new Date().toISOString()
         };
 
@@ -222,16 +274,24 @@ class QrTemplate {
         const bgColor = template.templateBgColor || '#1e293b';
         const textColor = template.templateTextColor || '#ffffff';
 
-        // 1. Solid background - no bands, no decorative elements
-        ctx.fillStyle = bgColor;
+        // 1. Background - solid or gradient
+        const bgColor2 = template.templateBgColor2 || null;
+        if (bgColor2) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, H);
+            gradient.addColorStop(0, bgColor);
+            gradient.addColorStop(1, bgColor2);
+            ctx.fillStyle = gradient;
+        } else {
+            ctx.fillStyle = bgColor;
+        }
         ctx.fillRect(0, 0, W, H);
 
         let currentY = 60;
 
-        // 2. Logo (prominent, 180px)
+        // 2. Logo (configurable size)
         if (template.templateLogo && template.templateLogo.svgContent) {
             try {
-                const logoSize = 180;
+                const logoSize = template.templateLogoSize || 180;
                 const logoDataUrl = this.prepareSvgForCanvas(template.templateLogo.svgContent, logoSize, logoSize);
                 const logoImg = await this.loadImage(logoDataUrl);
                 ctx.drawImage(logoImg, (W - logoSize) / 2, currentY, logoSize, logoSize);
@@ -300,7 +360,8 @@ class QrTemplate {
         ctx.fillStyle = textColor;
         ctx.font = 'bold 40px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(`$${voucher.amount}`, W / 2, currentY);
+        const formattedAmount = Number(voucher.amount).toLocaleString('es-PY');
+        ctx.fillText(`Gs. ${formattedAmount}`, W / 2, currentY);
         currentY += 50;
 
         // 7. Customer name
@@ -311,21 +372,19 @@ class QrTemplate {
         const nameLines = this.measureWrappedLines(ctx, voucher.customerName || '', W - 120);
         currentY += nameLines * 34 + 20;
 
-        // 8. Pickup date and time (optional)
-        if (voucher.pickupDate || voucher.pickupTime) {
+        // 8. Pickup date and time range (from template/activity, not voucher)
+        if (template.pickupDate || template.pickupStartTime || template.pickupEndTime) {
             ctx.font = '24px Inter, sans-serif';
             ctx.fillStyle = textColor;
             let pickupStr = '';
-            if (voucher.pickupDate) {
-                const parts = voucher.pickupDate.split('-');
-                if (parts.length === 3) {
-                    pickupStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                } else {
-                    pickupStr = voucher.pickupDate;
-                }
+            if (template.pickupDate) {
+                const dateObj = new Date(template.pickupDate + 'T12:00:00');
+                pickupStr = dateObj.toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
             }
-            if (voucher.pickupTime) {
-                pickupStr += (pickupStr ? ' - ' : '') + voucher.pickupTime + ' hs';
+            if (template.pickupStartTime && template.pickupEndTime) {
+                pickupStr += (pickupStr ? ' de ' : '') + template.pickupStartTime + ' a ' + template.pickupEndTime + ' hs';
+            } else if (template.pickupStartTime) {
+                pickupStr += (pickupStr ? ' a las ' : '') + template.pickupStartTime + ' hs';
             }
             ctx.fillText(pickupStr, W / 2, currentY);
         }
